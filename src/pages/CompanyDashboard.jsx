@@ -1,6 +1,29 @@
+
+
 // import React, { useState, useEffect } from 'react';
-// import { Box, Heading, Text, VStack, HStack, IconButton, useToast } from '@chakra-ui/react';
-// import { FaUserEdit } from 'react-icons/fa';
+// import {
+//   Box,
+//   Heading,
+//   Text,
+//   VStack,
+//   HStack,
+//   IconButton,
+//   Drawer,
+//   DrawerBody,
+//   DrawerHeader,
+//   DrawerOverlay,
+//   DrawerContent,
+//   DrawerCloseButton,
+//   useDisclosure,
+//   Badge,
+//   Popover,
+//   PopoverTrigger,
+//   PopoverContent,
+//   PopoverHeader,
+//   PopoverBody,
+//   PopoverCloseButton,
+// } from '@chakra-ui/react';
+// import { FaUserEdit, FaBars, FaBell } from 'react-icons/fa';
 // import { useNavigate } from 'react-router-dom';
 // import axios from 'axios';
 // import Navbar from '../components/Navbar.jsx';
@@ -11,9 +34,11 @@
 // function CompanyDashboard() {
 //   const { user } = useAuth();
 //   const navigate = useNavigate();
-//   const toast = useToast();
+//   const { isOpen, onOpen, onClose } = useDisclosure();
+//   const { isOpen: isNotifOpen, onOpen: onNotifOpen, onClose: onNotifClose } = useDisclosure();
 //   const [ads, setAds] = useState([]);
 //   const [notifications, setNotifications] = useState([]);
+//   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
 //   const fetchAds = async () => {
 //     try {
@@ -34,15 +59,7 @@
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       setNotifications(res.data);
-//       res.data.forEach((notif) => {
-//         toast({
-//           title: 'Notification',
-//           description: notif.message,
-//           status: 'info',
-//           duration: 5000,
-//           isClosable: true,
-//         });
-//       });
+//       setUnreadNotifications(res.data.length);
 //     } catch (err) {
 //       console.error('Error fetching notifications:', err);
 //     }
@@ -53,18 +70,72 @@
 //     fetchNotifications();
 //   }, []);
 
+//   const handleNotifOpen = () => {
+//     setUnreadNotifications(0); // Mark notifications as read when opened
+//     onNotifOpen();
+//   };
+
 //   return (
 //     <>
 //       <Navbar />
 //       <Box minH="calc(100vh - 160px)" p={6} bg="gray.50">
 //         <HStack justify="space-between" mb={6}>
-//           <Heading size="lg" color="brand.500">Company Dashboard</Heading>
-//           <IconButton
-//             icon={<FaUserEdit />}
-//             colorScheme="brand"
-//             onClick={() => navigate('/company/profile')}
-//             aria-label="Edit Profile"
-//           />
+//           <HStack>
+//             <IconButton
+//               icon={<FaBars />}
+//               colorScheme="brand"
+//               onClick={onOpen}
+//               aria-label="Open Sidebar"
+//             />
+//             <Heading size="lg" color="brand.500">Company Dashboard</Heading>
+//           </HStack>
+//           <HStack>
+//             <Popover>
+//               <PopoverTrigger>
+//                 <IconButton
+//                   icon={<FaBell />}
+//                   colorScheme="brand"
+//                   onClick={handleNotifOpen}
+//                   aria-label="Notifications"
+//                   position="relative"
+//                 >
+//                   {unreadNotifications > 0 && (
+//                     <Badge
+//                       position="absolute"
+//                       top="-1"
+//                       right="-1"
+//                       colorScheme="red"
+//                       borderRadius="full"
+//                       px={2}
+//                     >
+//                       {unreadNotifications}
+//                     </Badge>
+//                   )}
+//                 </IconButton>
+//               </PopoverTrigger>
+//               <PopoverContent>
+//                 <PopoverHeader>Notifications</PopoverHeader>
+//                 <PopoverCloseButton />
+//                 <PopoverBody>
+//                   {notifications.length === 0 ? (
+//                     <Text>No notifications.</Text>
+//                   ) : (
+//                     notifications.map((notif, index) => (
+//                       <Text key={index} mb={2}>
+//                         {notif.message} - {new Date(notif.createdAt).toLocaleDateString()}
+//                       </Text>
+//                     ))
+//                   )}
+//                 </PopoverBody>
+//               </PopoverContent>
+//             </Popover>
+//             <IconButton
+//               icon={<FaUserEdit />}
+//               colorScheme="brand"
+//               onClick={() => navigate('/company/profile')}
+//               aria-label="Edit Profile"
+//             />
+//           </HStack>
 //         </HStack>
 //         <VStack spacing={6} align="stretch">
 //           <Text fontSize="xl">Welcome, {user.name}!</Text>
@@ -88,6 +159,40 @@
 //           )}
 //         </VStack>
 //       </Box>
+//       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
+//         <DrawerOverlay />
+//         <DrawerContent>
+//           <DrawerCloseButton />
+//           <DrawerHeader>Accepted Ads</DrawerHeader>
+//           <DrawerBody>
+//             {ads.filter((ad) => ad.status === 'accepted').length === 0 ? (
+//               <Text>No ads have been accepted yet.</Text>
+//             ) : (
+//               ads
+//                 .filter((ad) => ad.status === 'accepted')
+//                 .map((ad) => (
+//                   <Box key={ad._id} p={4} mb={4} bg="gray.100" borderRadius="md">
+//                     <Text fontWeight="bold">{ad.title}</Text>
+//                     <Text>{ad.description}</Text>
+//                     <Text>Budget: ${ad.budget}</Text>
+//                     <Text>Category: {ad.category}</Text>
+//                     <Text>Accepted by: {ad.acceptedBy.name}</Text>
+//                     {ad.proof && ad.proof.submittedAt ? (
+//                       <Box mt={2}>
+//                         <Text fontWeight="bold">Proof Submitted:</Text>
+//                         <Text>Link: <a href={ad.proof.link} target="_blank" rel="noopener noreferrer">{ad.proof.link}</a></Text>
+//                         <Text>Description: {ad.proof.description}</Text>
+//                         <Text>Submitted At: {new Date(ad.proof.submittedAt).toLocaleDateString()}</Text>
+//                       </Box>
+//                     ) : (
+//                       <Text mt={2}>Proof: Not submitted yet</Text>
+//                     )}
+//                   </Box>
+//                 ))
+//             )}
+//           </DrawerBody>
+//         </DrawerContent>
+//       </Drawer>
 //       <Footer />
 //     </>
 //   );
@@ -117,6 +222,7 @@ import {
   PopoverHeader,
   PopoverBody,
   PopoverCloseButton,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { FaUserEdit, FaBars, FaBell } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -130,7 +236,11 @@ function CompanyDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen: isNotifOpen, onOpen: onNotifOpen, onClose: onNotifClose } = useDisclosure();
+  const {
+    isOpen: isNotifOpen,
+    onOpen: onNotifOpen,
+    onClose: onNotifClose,
+  } = useDisclosure();
   const [ads, setAds] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -166,34 +276,42 @@ function CompanyDashboard() {
   }, []);
 
   const handleNotifOpen = () => {
-    setUnreadNotifications(0); // Mark notifications as read when opened
+    setUnreadNotifications(0); // Mark as read
     onNotifOpen();
   };
 
   return (
     <>
       <Navbar />
-      <Box minH="calc(100vh - 160px)" p={6} bg="gray.50">
-        <HStack justify="space-between" mb={6}>
-          <HStack>
+      <Box minH="calc(100vh - 160px)" p={{ base: 4, md: 6 }} bg="gray.50">
+        <HStack
+          justify="space-between"
+          align="start"
+          mb={6}
+          flexDirection={{ base: 'column', md: 'row' }}
+        >
+          <HStack spacing={4} mb={{ base: 4, md: 0 }}>
             <IconButton
               icon={<FaBars />}
               colorScheme="brand"
               onClick={onOpen}
               aria-label="Open Sidebar"
             />
-            <Heading size="lg" color="brand.500">Company Dashboard</Heading>
+            <Heading size={{ base: 'md', md: 'lg' }} color="brand.500">
+              Company Dashboard
+            </Heading>
           </HStack>
-          <HStack>
+
+          <HStack spacing={4}>
             <Popover>
               <PopoverTrigger>
-                <IconButton
-                  icon={<FaBell />}
-                  colorScheme="brand"
-                  onClick={handleNotifOpen}
-                  aria-label="Notifications"
-                  position="relative"
-                >
+                <Box position="relative">
+                  <IconButton
+                    icon={<FaBell />}
+                    colorScheme="brand"
+                    onClick={handleNotifOpen}
+                    aria-label="Notifications"
+                  />
                   {unreadNotifications > 0 && (
                     <Badge
                       position="absolute"
@@ -206,7 +324,7 @@ function CompanyDashboard() {
                       {unreadNotifications}
                     </Badge>
                   )}
-                </IconButton>
+                </Box>
               </PopoverTrigger>
               <PopoverContent>
                 <PopoverHeader>Notifications</PopoverHeader>
@@ -216,7 +334,7 @@ function CompanyDashboard() {
                     <Text>No notifications.</Text>
                   ) : (
                     notifications.map((notif, index) => (
-                      <Text key={index} mb={2}>
+                      <Text key={index} mb={2} fontSize="sm">
                         {notif.message} - {new Date(notif.createdAt).toLocaleDateString()}
                       </Text>
                     ))
@@ -224,6 +342,7 @@ function CompanyDashboard() {
                 </PopoverBody>
               </PopoverContent>
             </Popover>
+
             <IconButton
               icon={<FaUserEdit />}
               colorScheme="brand"
@@ -232,16 +351,24 @@ function CompanyDashboard() {
             />
           </HStack>
         </HStack>
+
         <VStack spacing={6} align="stretch">
-          <Text fontSize="xl">Welcome, {user.name}!</Text>
+          <Text fontSize={{ base: 'md', md: 'xl' }}>Welcome, {user.name}!</Text>
           <CreateAd onAdCreated={fetchAds} />
-          <Text fontSize="lg">Your Ads</Text>
+          <Text fontSize={{ base: 'md', md: 'lg' }}>Your Ads</Text>
           {ads.length === 0 ? (
             <Text>No ads created yet.</Text>
           ) : (
             ads.map((ad) => (
-              <Box key={ad._id} p={4} bg="white" borderRadius="md" boxShadow="md">
-                <Text fontWeight="bold">{ad.title}</Text>
+              <Box
+                key={ad._id}
+                p={4}
+                bg="white"
+                borderRadius="md"
+                boxShadow="md"
+                overflowX="auto"
+              >
+                <Text fontWeight="bold" fontSize="md">{ad.title}</Text>
                 <Text>{ad.description}</Text>
                 <Text>Budget: ${ad.budget}</Text>
                 <Text>Category: {ad.category}</Text>
@@ -254,6 +381,7 @@ function CompanyDashboard() {
           )}
         </VStack>
       </Box>
+
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
@@ -275,9 +403,17 @@ function CompanyDashboard() {
                     {ad.proof && ad.proof.submittedAt ? (
                       <Box mt={2}>
                         <Text fontWeight="bold">Proof Submitted:</Text>
-                        <Text>Link: <a href={ad.proof.link} target="_blank" rel="noopener noreferrer">{ad.proof.link}</a></Text>
+                        <Text>
+                          Link:{' '}
+                          <a href={ad.proof.link} target="_blank" rel="noopener noreferrer">
+                            {ad.proof.link}
+                          </a>
+                        </Text>
                         <Text>Description: {ad.proof.description}</Text>
-                        <Text>Submitted At: {new Date(ad.proof.submittedAt).toLocaleDateString()}</Text>
+                        <Text>
+                          Submitted At:{' '}
+                          {new Date(ad.proof.submittedAt).toLocaleDateString()}
+                        </Text>
                       </Box>
                     ) : (
                       <Text mt={2}>Proof: Not submitted yet</Text>
@@ -288,6 +424,7 @@ function CompanyDashboard() {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
+
       <Footer />
     </>
   );
