@@ -336,7 +336,7 @@ function InfluencerDashboard() {
     const fetchAds = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5001/api/ads', {
+        const res = await axios.get('https://ad-chain-backend.vercel.app/api/ads', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAds(res.data);
@@ -348,7 +348,7 @@ function InfluencerDashboard() {
     const fetchAcceptedAds = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5001/api/ads/accepted', {
+        const res = await axios.get('https://ad-chain-backend.vercel.app/api/ads/accepted', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAcceptedAds(res.data);
@@ -364,11 +364,11 @@ function InfluencerDashboard() {
   const handleAcceptAd = async (adId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5001/api/ads/${adId}/accept`, {}, {
+      await axios.post(`https://ad-chain-backend.vercel.app/api/ads/${adId}/accept`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAds(ads.filter((ad) => ad._id !== adId));
-      const res = await axios.get('http://localhost:5001/api/ads/accepted', {
+      const res = await axios.get('https://ad-chain-backend.vercel.app/api/ads/accepted', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAcceptedAds(res.data);
@@ -394,13 +394,13 @@ function InfluencerDashboard() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:5001/api/ads/${adId}/submit-proof`,
+        `https://ad-chain-backend.vercel.app/api/ads/${adId}/submit-proof`,
         proofData,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      const res = await axios.get('http://localhost:5001/api/ads/accepted', {
+      const res = await axios.get('https://ad-chain-backend.vercel.app/api/ads/accepted', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAcceptedAds(res.data);
