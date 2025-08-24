@@ -384,7 +384,7 @@ const InfluencerProfile = () => {
       if (!user) return;
 
       try {
-        const res = await axios.get('http://localhost:5001/api/users/profile', {
+        const res = await axios.get('https://ad-chain-backend.vercel.app/api/users/profile', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -403,7 +403,7 @@ const InfluencerProfile = () => {
   const handleEditToggle = async () => {
     if (isEditing) {
       try {
-        const res = await axios.put('http://localhost:5001/api/users/profile', editedProfile, {
+        const res = await axios.put('https://ad-chain-backend.vercel.app/api/users/profile', editedProfile, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
