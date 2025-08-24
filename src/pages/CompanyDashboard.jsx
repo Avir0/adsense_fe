@@ -248,7 +248,7 @@ function CompanyDashboard() {
   const fetchAds = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5001/api/ads/my-ads', {
+      const res = await axios.get('https://ad-chain-backend.vercel.app/api/ads/my-ads', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAds(res.data);
@@ -260,7 +260,7 @@ function CompanyDashboard() {
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5001/api/users/notifications', {
+      const res = await axios.get('https://ad-chain-backend.vercel.app/api/users/notifications', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotifications(res.data);
