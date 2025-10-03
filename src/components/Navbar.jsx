@@ -70,9 +70,7 @@
 
 
 
-
-
-
+// Navbar.jsx
 import { useState } from 'react';
 import {
   Flex, Heading, Image, Button, IconButton, Box, VStack, Collapse, useDisclosure
@@ -80,14 +78,13 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import logo from '../assets/logo1.jpg';
 
-const Navbar = () => {
+const Navbar = ({ footerRef }) => {
   const { isOpen, onToggle } = useDisclosure();
 
-  // ✅ CHANGE: Function to scroll to footer
+  // ✅ Scroll to Footer using ref
   const scrollToFooter = () => {
-    const footer = document.getElementById('footer'); // Make sure your footer has id="footer"
-    if (footer) {
-      footer.scrollIntoView({ behavior: 'smooth' });
+    if (footerRef?.current) {
+      footerRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -116,8 +113,9 @@ const Navbar = () => {
           _hover={{ bg: 'orange.500' }}
         />
 
+        {/* Desktop Menu */}
         <Flex display={{ base: 'none', md: 'flex' }} ml={4}>
-          {/* ✅ CHANGE: Home button links to external URL */}
+          {/* ✅ Home button opens external URL */}
           <Button
             as="a"
             href="https://adchain-omega.vercel.app/"
@@ -131,7 +129,7 @@ const Navbar = () => {
             Home
           </Button>
 
-          {/* Optional: About button (can scroll to section later) */}
+          {/* About button (optional scroll to section later) */}
           <Button
             variant="ghost"
             color="white"
@@ -141,7 +139,7 @@ const Navbar = () => {
             About
           </Button>
 
-          {/* ✅ CHANGE: Contact button scrolls to footer */}
+          {/* ✅ Contact button scrolls to Footer */}
           <Button
             variant="ghost"
             color="white"
@@ -154,7 +152,7 @@ const Navbar = () => {
         </Flex>
       </Flex>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       <Collapse in={isOpen} animateOpacity>
         <VStack
           bg="red.400"
@@ -162,7 +160,7 @@ const Navbar = () => {
           py={4}
           display={{ md: 'none' }}
         >
-          {/* ✅ CHANGE: Home button links to external URL */}
+          {/* ✅ Home button */}
           <Button
             as="a"
             href="https://adchain-omega.vercel.app/"
@@ -176,7 +174,7 @@ const Navbar = () => {
 
           <Button variant="ghost" _hover={{ bg: 'blue.500' }}>About</Button>
 
-          {/* ✅ CHANGE: Contact button scrolls to footer */}
+          {/* ✅ Contact button */}
           <Button
             variant="ghost"
             onClick={scrollToFooter}
