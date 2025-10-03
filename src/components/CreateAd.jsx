@@ -35,7 +35,7 @@ function CreateAd({ onAdCreated }) {
     try {
       setError('');
       const token = localStorage.getItem('token');
-      await axios.post('https://ad-chain-backend.vercel.app//api/ads', adData, {
+      await axios.post('https://ad-chain-backend.vercel.app/api/ads', adData, {
       
         headers: { Authorization: `Bearer ${token}` },
       });
