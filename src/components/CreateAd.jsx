@@ -120,15 +120,13 @@ import {
   useToast,
   IconButton,
   Text,
-  HStack,
 } from "@chakra-ui/react";
-import { FaRobot, FaTimes, FaPaperPlane } from "react-icons/fa";
+import { FaRobot, FaTimes } from "react-icons/fa";
 import axios from "axios";
 
 function CreateAd({ onAdCreated }) {
   const toast = useToast();
 
-  // ================= FORM STATE =================
   const [form, setForm] = useState({
     title: "",
     objective: "",
@@ -147,93 +145,46 @@ function CreateAd({ onAdCreated }) {
     hashtags: "",
   });
 
-  // ================= AI CHAT STATE =================
   const [showAI, setShowAI] = useState(false);
-  const [chat, setChat] = useState([
-    { sender: "bot", text: "Hi 👋 I'm Adchain AI. What product are you promoting?" },
-  ]);
-  const [userInput, setUserInput] = useState("");
-  const [step, setStep] = useState(0);
+  const [aiInput, setAiInput] = useState("");
 
-  const answers = {};
-
-  const questions = [
-    "What product or service are you promoting?",
-    "Who is your target audience?",
-    "What is your campaign goal? (sales / awareness)",
-    "What is your budget?",
-    "How many influencers do you want?",
-  ];
-
-  // ================= HANDLE FORM =================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ================= HANDLE CHAT SEND =================
-  const handleSend = () => {
-    if (!userInput.trim()) return;
+  // 🤖 Floating AI generate → auto fill form
+  const handleAIGenerate = () => {
+    if (!aiInput.trim()) {
+      toast({ title: "Describe your product first", status: "warning" });
+      return;
+    }
 
-    const newChat = [...chat, { sender: "user", text: userInput }];
-    setChat(newChat);
-
-    const updatedAnswers = { ...answers };
-    updatedAnswers[step] = userInput;
-
-    setTimeout(() => {
-      if (step < questions.length - 1) {
-        setChat((prev) => [
-          ...prev,
-          { sender: "bot", text: questions[step + 1] },
-        ]);
-        setStep(step + 1);
-      } else {
-        generateCampaign(updatedAnswers);
-      }
-    }, 500);
-
-    setUserInput("");
-  };
-
-  // ================= GENERATE CAMPAIGN =================
-  const generateCampaign = (data) => {
-    const product = data[0];
-    const audience = data[1];
-    const goal = data[2];
-    const budget = data[3];
-    const influencers = data[4];
+    const productName = aiInput.split(" ")[0];
 
     setForm((prev) => ({
       ...prev,
-      product,
-      title: `${product} Influencer Campaign`,
-      description: `We are promoting ${product} targeting ${audience} to achieve ${goal}.`,
-      usp: "High quality, trending, and affordable",
-      objective: goal.toLowerCase().includes("sale") ? "Sales" : "Brand Awareness",
+      product: productName,
+      title: `${productName} Influencer Campaign`,
+      description: `We are launching ${productName} targeted towards young audience to increase brand awareness and engagement.`,
+      usp: "High quality, affordable and trending product",
+      objective: "Brand Awareness",
       platform: "Instagram",
       ageGroup: "18-34",
       deliverables: "1 Reel + 2 Stories",
       hashtags: "#adchain #viral #influencer",
       minFollowers: "10000",
-      influencersRequired: influencers,
-      budget,
+      influencersRequired: "5",
       category: "Fashion",
+      audience: "Young adults",
+      location: "India",
     }));
 
-    setChat((prev) => [
-      ...prev,
-      { sender: "bot", text: "Your campaign is ready! I’ve filled the form for you 🤖✨" },
-    ]);
+    toast({ title: "AI filled the campaign form 🤖✨", status: "success" });
 
-    toast({
-      title: "AI campaign created successfully",
-      status: "success",
-    });
-
-    setTimeout(() => setShowAI(false), 1500);
+    setAiInput("");
+    setShowAI(false);
   };
 
-  // ================= SUBMIT =================
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -241,7 +192,9 @@ function CreateAd({ onAdCreated }) {
       await axios.post(
         "https://ad-chain-backend.vercel.app/api/ads",
         form,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
       toast({ title: "Campaign created successfully", status: "success" });
@@ -254,23 +207,49 @@ function CreateAd({ onAdCreated }) {
 
   return (
     <>
-      {/* ================= FORM ================= */}
+      {/* ================= MAIN FORM ================= */}
       <Box bg="white" p={6} borderRadius="lg" boxShadow="md">
         <Heading size="md" mb={4} color="brand.500">
-          Create Campaign
+          Create New Campaign
         </Heading>
 
         <VStack spacing={4} align="stretch">
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            <Input name="title" placeholder="Campaign Title" value={form.title} onChange={handleChange} />
-            <Input name="product" placeholder="Product" value={form.product} onChange={handleChange} />
+            <Input placeholder="Campaign Title" name="title" value={form.title} onChange={handleChange} />
+            <Select name="objective" value={form.objective} onChange={handleChange}>
+              <option value="">Objective</option>
+              <option>Brand Awareness</option>
+              <option>Sales</option>
+            </Select>
+
+            <Select name="category" value={form.category} onChange={handleChange}>
+              <option value="">Category</option>
+              <option>Fashion</option>
+              <option>Tech</option>
+              <option>Fitness</option>
+            </Select>
+
+            <Input placeholder="Product Name" name="product" value={form.product} onChange={handleChange} />
           </SimpleGrid>
 
-          <Textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} />
+          <Textarea placeholder="Description" name="description" value={form.description} onChange={handleChange} />
+          <Input placeholder="USP" name="usp" value={form.usp} onChange={handleChange} />
+
+          <Divider />
+
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+            <Input placeholder="Audience" name="audience" value={form.audience} onChange={handleChange} />
+            <Input placeholder="Location" name="location" value={form.location} onChange={handleChange} />
+            <Select name="platform" value={form.platform} onChange={handleChange}>
+              <option value="">Platform</option>
+              <option>Instagram</option>
+              <option>YouTube</option>
+            </Select>
+          </SimpleGrid>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            <Input name="budget" placeholder="Budget" value={form.budget} onChange={handleChange} />
-            <Input name="influencersRequired" placeholder="Influencers Required" value={form.influencersRequired} onChange={handleChange} />
+            <Input placeholder="Influencers Required" name="influencersRequired" value={form.influencersRequired} onChange={handleChange} />
+            <Input placeholder="Budget" name="budget" value={form.budget} onChange={handleChange} />
           </SimpleGrid>
 
           <Button colorScheme="brand" onClick={handleSubmit}>
@@ -289,52 +268,49 @@ function CreateAd({ onAdCreated }) {
         size="lg"
         borderRadius="full"
         boxShadow="lg"
-        onClick={() => setShowAI(true)}
         zIndex="1000"
+        onClick={() => setShowAI(true)}
+        aria-label="AI Assistant"
       />
 
-      {/* ================= CHAT AI PANEL ================= */}
+      {/* ================= FLOATING AI PANEL ================= */}
       {showAI && (
         <Box
           position="fixed"
           bottom="90px"
           right="25px"
           bg="white"
-          w="350px"
+          p={4}
+          w="320px"
           borderRadius="lg"
           boxShadow="2xl"
-          p={4}
           zIndex="1001"
         >
-          <HStack justify="space-between" mb={2}>
-            <Text fontWeight="bold">🤖 Adchain AI</Text>
-            <IconButton size="sm" icon={<FaTimes />} onClick={() => setShowAI(false)} />
-          </HStack>
+          <VStack align="stretch" spacing={3}>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Text fontWeight="bold">🤖 Adchain AI Assistant</Text>
+              <IconButton
+                icon={<FaTimes />}
+                size="sm"
+                onClick={() => setShowAI(false)}
+                aria-label="Close AI"
+              />
+            </Box>
 
-          <Box h="250px" overflowY="auto" p={2} bg="gray.50" borderRadius="md">
-            {chat.map((msg, i) => (
-              <Box
-                key={i}
-                bg={msg.sender === "bot" ? "purple.100" : "blue.100"}
-                p={2}
-                borderRadius="md"
-                mb={2}
-                alignSelf={msg.sender === "bot" ? "flex-start" : "flex-end"}
-              >
-                <Text fontSize="sm">{msg.text}</Text>
-              </Box>
-            ))}
-          </Box>
+            <Text fontSize="sm">
+              Describe your product/business and I will create a campaign for you.
+            </Text>
 
-          <HStack mt={3}>
-            <Input
-              placeholder="Type your reply..."
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            <Textarea
+              placeholder="Example: We sell affordable shoes for college students"
+              value={aiInput}
+              onChange={(e) => setAiInput(e.target.value)}
             />
-            <IconButton icon={<FaPaperPlane />} onClick={handleSend} />
-          </HStack>
+
+            <Button colorScheme="purple" onClick={handleAIGenerate}>
+              Generate Campaign
+            </Button>
+          </VStack>
         </Box>
       )}
     </>
