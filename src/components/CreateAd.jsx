@@ -117,11 +117,9 @@ import {
   VStack,
   SimpleGrid,
   Divider,
-  useToast,
-  IconButton,
   Text,
+  useToast,
 } from "@chakra-ui/react";
-import { FaRobot, FaTimes } from "react-icons/fa";
 import axios from "axios";
 
 function CreateAd({ onAdCreated }) {
@@ -145,44 +143,42 @@ function CreateAd({ onAdCreated }) {
     hashtags: "",
   });
 
-  const [showAI, setShowAI] = useState(false);
-  const [aiInput, setAiInput] = useState("");
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🤖 Floating AI generate → auto fill form
-  const handleAIGenerate = () => {
-    if (!aiInput.trim()) {
-      toast({ title: "Describe your product first", status: "warning" });
+  // 🤖 Improved AI Generator
+  const generateWithAI = () => {
+    if (!form.product.trim()) {
+      toast({
+        title: "Please enter product name first",
+        status: "warning",
+        duration: 2000,
+      });
       return;
     }
 
-    const productName = aiInput.split(" ")[0];
+    const audience = form.audience || "young audience";
 
     setForm((prev) => ({
       ...prev,
-      product: productName,
-      title: `${productName} Influencer Campaign`,
-      description: `We are launching ${productName} targeted towards young audience to increase brand awareness and engagement.`,
+      title: `${prev.product} Influencer Marketing Campaign`,
+      description: `We are launching ${prev.product} targeted towards ${audience}. The campaign focuses on engaging content and strong brand visibility.`,
       usp: "High quality, affordable and trending product",
       objective: "Brand Awareness",
       platform: "Instagram",
       ageGroup: "18-34",
       deliverables: "1 Reel + 2 Stories",
-      hashtags: "#adchain #viral #influencer",
+      hashtags: "#adchain #viral #influencermarketing",
       minFollowers: "10000",
-      influencersRequired: "5",
-      category: "Fashion",
-      audience: "Young adults",
-      location: "India",
+      influencersRequired: prev.influencersRequired || "5",
     }));
 
-    toast({ title: "AI filled the campaign form 🤖✨", status: "success" });
-
-    setAiInput("");
-    setShowAI(false);
+    toast({
+      title: "AI generated campaign successfully 🤖✨",
+      status: "success",
+      duration: 2000,
+    });
   };
 
   const handleSubmit = async () => {
@@ -190,15 +186,35 @@ function CreateAd({ onAdCreated }) {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://ad-chain-backend.vercel.app/api/ads",
+        "https://ad-chain-backend.vercel.app/api/ads", // ✅ FIXED URL
         form,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      toast({ title: "Campaign created successfully", status: "success" });
+      toast({ title: "Ad created successfully", status: "success" });
       onAdCreated();
+
+      // Optional: reset form
+      setForm({
+        title: "",
+        objective: "",
+        category: "",
+        product: "",
+        description: "",
+        usp: "",
+        audience: "",
+        ageGroup: "",
+        location: "",
+        platform: "",
+        influencersRequired: "",
+        minFollowers: "",
+        budget: "",
+        deliverables: "",
+        hashtags: "",
+      });
+
     } catch (err) {
       console.error(err);
       toast({ title: "Error creating ad", status: "error" });
@@ -206,114 +222,91 @@ function CreateAd({ onAdCreated }) {
   };
 
   return (
-    <>
-      {/* ================= MAIN FORM ================= */}
-      <Box bg="white" p={6} borderRadius="lg" boxShadow="md">
-        <Heading size="md" mb={4} color="brand.500">
-          Create New Campaign
-        </Heading>
+    <Box bg="white" p={6} borderRadius="lg" boxShadow="md">
+      <Heading size="md" mb={4} color="brand.500">
+        Create New Campaign (AI Powered)
+      </Heading>
 
-        <VStack spacing={4} align="stretch">
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            <Input placeholder="Campaign Title" name="title" value={form.title} onChange={handleChange} />
-            <Select name="objective" value={form.objective} onChange={handleChange}>
-              <option value="">Objective</option>
-              <option>Brand Awareness</option>
-              <option>Sales</option>
-            </Select>
+      <VStack spacing={4} align="stretch">
 
-            <Select name="category" value={form.category} onChange={handleChange}>
-              <option value="">Category</option>
-              <option>Fashion</option>
-              <option>Tech</option>
-              <option>Fitness</option>
-            </Select>
+        <Button colorScheme="purple" onClick={generateWithAI}>
+          🤖 Generate Campaign with AI
+        </Button>
 
-            <Input placeholder="Product Name" name="product" value={form.product} onChange={handleChange} />
-          </SimpleGrid>
+        <Divider />
 
-          <Textarea placeholder="Description" name="description" value={form.description} onChange={handleChange} />
-          <Input placeholder="USP" name="usp" value={form.usp} onChange={handleChange} />
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+          <Input placeholder="Campaign Title" name="title" value={form.title} onChange={handleChange} />
+          <Select name="objective" value={form.objective} onChange={handleChange}>
+            <option value="">Objective</option>
+            <option>Brand Awareness</option>
+            <option>Sales</option>
+            <option>Website Traffic</option>
+            <option>App Installs</option>
+          </Select>
 
-          <Divider />
+          <Select name="category" value={form.category} onChange={handleChange}>
+            <option value="">Category</option>
+            <option>Fashion</option>
+            <option>Tech</option>
+            <option>Fitness</option>
+            <option>Food</option>
+            <option>Education</option>
+          </Select>
 
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-            <Input placeholder="Audience" name="audience" value={form.audience} onChange={handleChange} />
-            <Input placeholder="Location" name="location" value={form.location} onChange={handleChange} />
-            <Select name="platform" value={form.platform} onChange={handleChange}>
-              <option value="">Platform</option>
-              <option>Instagram</option>
-              <option>YouTube</option>
-            </Select>
-          </SimpleGrid>
+          <Input placeholder="Product Name" name="product" value={form.product} onChange={handleChange} />
+        </SimpleGrid>
 
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            <Input placeholder="Influencers Required" name="influencersRequired" value={form.influencersRequired} onChange={handleChange} />
-            <Input placeholder="Budget" name="budget" value={form.budget} onChange={handleChange} />
-          </SimpleGrid>
+        <Textarea placeholder="Product Description" name="description" value={form.description} onChange={handleChange} />
+        <Input placeholder="Unique Selling Point (USP)" name="usp" value={form.usp} onChange={handleChange} />
 
-          <Button colorScheme="brand" onClick={handleSubmit}>
-            Create Campaign
-          </Button>
-        </VStack>
-      </Box>
+        <Divider />
 
-      {/* ================= FLOATING AI BUTTON ================= */}
-      <IconButton
-        icon={<FaRobot />}
-        position="fixed"
-        bottom="25px"
-        right="25px"
-        colorScheme="purple"
-        size="lg"
-        borderRadius="full"
-        boxShadow="lg"
-        zIndex="1000"
-        onClick={() => setShowAI(true)}
-        aria-label="AI Assistant"
-      />
+        <Heading size="sm">Target Audience</Heading>
 
-      {/* ================= FLOATING AI PANEL ================= */}
-      {showAI && (
-        <Box
-          position="fixed"
-          bottom="90px"
-          right="25px"
-          bg="white"
-          p={4}
-          w="320px"
-          borderRadius="lg"
-          boxShadow="2xl"
-          zIndex="1001"
-        >
-          <VStack align="stretch" spacing={3}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Text fontWeight="bold">🤖 Adchain AI Assistant</Text>
-              <IconButton
-                icon={<FaTimes />}
-                size="sm"
-                onClick={() => setShowAI(false)}
-                aria-label="Close AI"
-              />
-            </Box>
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+          <Input placeholder="Audience Type" name="audience" value={form.audience} onChange={handleChange} />
+          <Select name="ageGroup" value={form.ageGroup} onChange={handleChange}>
+            <option value="">Age Group</option>
+            <option>13-17</option>
+            <option>18-24</option>
+            <option>25-34</option>
+            <option>35+</option>
+          </Select>
+          <Input placeholder="Location" name="location" value={form.location} onChange={handleChange} />
+        </SimpleGrid>
 
-            <Text fontSize="sm">
-              Describe your product/business and I will create a campaign for you.
-            </Text>
+        <Divider />
 
-            <Textarea
-              placeholder="Example: We sell affordable shoes for college students"
-              value={aiInput}
-              onChange={(e) => setAiInput(e.target.value)}
-            />
+        <Heading size="sm">Influencer Requirements</Heading>
 
-            <Button colorScheme="purple" onClick={handleAIGenerate}>
-              Generate Campaign
-            </Button>
-          </VStack>
-        </Box>
-      )}
-    </>
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+          <Select name="platform" value={form.platform} onChange={handleChange}>
+            <option value="">Platform</option>
+            <option>Instagram</option>
+            <option>YouTube</option>
+            <option>LinkedIn</option>
+          </Select>
+          <Input placeholder="Influencers Required" name="influencersRequired" value={form.influencersRequired} onChange={handleChange} />
+          <Input placeholder="Minimum Followers" name="minFollowers" value={form.minFollowers} onChange={handleChange} />
+        </SimpleGrid>
+
+        <Divider />
+
+        <Heading size="sm">Budget & Deliverables</Heading>
+
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+          <Input placeholder="Total Budget ($)" name="budget" value={form.budget} onChange={handleChange} />
+          <Input placeholder="Deliverables" name="deliverables" value={form.deliverables} onChange={handleChange} />
+        </SimpleGrid>
+
+        <Input placeholder="Hashtags" name="hashtags" value={form.hashtags} onChange={handleChange} />
+
+        <Button colorScheme="brand" onClick={handleSubmit}>
+          Create Campaign
+        </Button>
+      </VStack>
+    </Box>
   );
 }
 
