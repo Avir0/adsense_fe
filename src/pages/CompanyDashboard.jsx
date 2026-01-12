@@ -263,8 +263,12 @@ import {
   PopoverHeader,
   PopoverBody,
   PopoverCloseButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
-import { FaUserEdit, FaBars, FaBell } from "react-icons/fa";
+import { FaUserEdit, FaBars, FaBell, FaEllipsisV } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
@@ -352,23 +356,11 @@ function CompanyDashboard() {
   // ------------------ AI Insights ------------------
   const insights = [];
 
-  if (total === 0) {
-    insights.push("🧠 Create your first campaign to unlock insights.");
-  }
-
-  if (acceptanceRate >= 60) {
-    insights.push("🚀 Strong acceptance rate. Increase budget for growth.");
-  } else if (acceptanceRate > 0) {
-    insights.push("📉 Improve targeting and descriptions to boost acceptance.");
-  }
-
-  if (pending >= 3) {
-    insights.push("⏳ Several campaigns pending. Improve clarity & incentives.");
-  }
-
-  if (accepted >= 5) {
-    insights.push("💎 You are performing better than most brands on the platform.");
-  }
+  if (total === 0) insights.push("🧠 Create your first campaign to unlock insights.");
+  if (acceptanceRate >= 60) insights.push("🚀 Strong acceptance rate. Increase budget.");
+  else if (acceptanceRate > 0) insights.push("📉 Improve targeting for better acceptance.");
+  if (pending >= 3) insights.push("⏳ Too many pending campaigns. Improve clarity.");
+  if (accepted >= 5) insights.push("💎 You are a top-performing brand!");
 
   return (
     <>
@@ -384,19 +376,12 @@ function CompanyDashboard() {
           </HStack>
 
           <HStack spacing={4}>
-            {/* Notifications */}
             <Popover>
               <PopoverTrigger>
                 <Box position="relative">
                   <IconButton icon={<FaBell />} />
                   {unread > 0 && (
-                    <Badge
-                      position="absolute"
-                      top="-1"
-                      right="-1"
-                      colorScheme="red"
-                      borderRadius="full"
-                    >
+                    <Badge position="absolute" top="-1" right="-1" colorScheme="red">
                       {unread}
                     </Badge>
                   )}
@@ -406,33 +391,18 @@ function CompanyDashboard() {
                 <PopoverHeader>Notifications</PopoverHeader>
                 <PopoverCloseButton />
                 <PopoverBody>
-                  {notifications.length === 0 ? (
-                    <Text>No notifications</Text>
-                  ) : (
-                    notifications.map((n, i) => (
-                      <Text key={i} fontSize="sm">{n.message}</Text>
-                    ))
-                  )}
+                  {notifications.map((n, i) => (
+                    <Text key={i}>{n.message}</Text>
+                  ))}
                 </PopoverBody>
               </PopoverContent>
             </Popover>
 
-            <IconButton
-              icon={<FaUserEdit />}
-              onClick={() => navigate("/company/profile")}
-            />
+            <IconButton icon={<FaUserEdit />} onClick={() => navigate("/company/profile")} />
           </HStack>
         </HStack>
 
-        {/* WELCOME */}
-        <Box bg="white" p={5} borderRadius="xl" mb={6}>
-          <Heading size="sm">Welcome, {user?.name} 👋</Heading>
-          <Text fontSize="sm" color="gray.600">
-            Manage campaigns, analyze performance and grow faster.
-          </Text>
-        </Box>
-
-        {/* KPI CARDS */}
+        {/* KPI */}
         <SimpleGrid columns={{ base: 1, md: 4 }} spacing={4} mb={6}>
           {[
             { label: "Total Campaigns", value: total },
@@ -453,20 +423,20 @@ function CompanyDashboard() {
         {/* CHARTS */}
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mb={8}>
           <Box bg="white" p={5} borderRadius="xl">
-            <Heading size="sm" mb={3}>Campaign Growth</Heading>
+            <Heading size="sm">Growth</Heading>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={growthData}>
+                <Line type="monotone" dataKey="campaigns" stroke="#3182CE" />
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="campaigns" stroke="#3182CE" />
               </LineChart>
             </ResponsiveContainer>
           </Box>
 
           <Box bg="white" p={5} borderRadius="xl">
-            <Heading size="sm" mb={3}>Status Breakdown</Heading>
+            <Heading size="sm">Status</Heading>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie data={statusData} dataKey="value" outerRadius={80} label>
@@ -480,12 +450,12 @@ function CompanyDashboard() {
           </Box>
         </SimpleGrid>
 
-        {/* 🤖 AI INSIGHTS */}
+        {/* AI INSIGHTS */}
         <Box bg="white" p={6} borderRadius="xl" mb={8}>
-          <Heading size="md" mb={4}>🤖 AI Insights</Heading>
-          <VStack align="stretch" spacing={3}>
+          <Heading size="md">🤖 AI Insights</Heading>
+          <VStack align="stretch" mt={3}>
             {insights.map((text, i) => (
-              <Alert key={i} status="info" borderRadius="md">
+              <Alert key={i} status="info">
                 <AlertIcon />
                 {text}
               </Alert>
@@ -493,7 +463,7 @@ function CompanyDashboard() {
           </VStack>
         </Box>
 
-        {/* CREATE AD */}
+        {/* CREATE */}
         <CreateAd onAdCreated={fetchAds} />
 
         <Divider my={6} />
@@ -502,22 +472,56 @@ function CompanyDashboard() {
         <Heading size="md" mb={4}>Your Campaigns</Heading>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-          {ads.map((ad) => (
-            <Box key={ad._id} bg="white" p={4} borderRadius="xl">
-              <Heading size="sm">{ad.title}</Heading>
-              <Text fontSize="sm" color="gray.600">{ad.description}</Text>
+          {[...ads]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map((ad) => (
+              <Box key={ad._id} bg="white" p={4} borderRadius="xl" position="relative">
 
-              <HStack justify="space-between" mt={3}>
-                <Text fontSize="sm">₹{ad.budget}</Text>
-                <Badge colorScheme={
-                  ad.status === "accepted" ? "green" :
-                  ad.status === "rejected" ? "red" : "yellow"
-                }>
-                  {ad.status}
-                </Badge>
-              </HStack>
-            </Box>
-          ))}
+                {/* 3 DOT MENU */}
+                <Box position="absolute" top="10px" right="10px">
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      icon={<FaEllipsisV />}
+                      size="sm"
+                      variant="ghost"
+                    />
+                    <MenuList>
+                      <MenuItem
+                        color="red.500"
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem("token");
+                            await axios.delete(
+                              `https://ad-chain-backend.vercel.app/api/ads/${ad._id}`,
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            fetchAds();
+                          } catch (err) {
+                            console.error("Delete failed", err);
+                          }
+                        }}
+                      >
+                        Delete Campaign
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                </Box>
+
+                <Heading size="sm">{ad.title}</Heading>
+                <Text fontSize="sm" color="gray.600">{ad.description}</Text>
+
+                <HStack justify="space-between" mt={3}>
+                  <Text fontSize="sm">₹{ad.budget}</Text>
+                  <Badge colorScheme={
+                    ad.status === "accepted" ? "green" :
+                    ad.status === "rejected" ? "red" : "yellow"
+                  }>
+                    {ad.status}
+                  </Badge>
+                </HStack>
+              </Box>
+            ))}
         </SimpleGrid>
       </Box>
 
@@ -525,5 +529,8 @@ function CompanyDashboard() {
     </>
   );
 }
+
+export default CompanyDashboard;
+
 
 export default CompanyDashboard;
