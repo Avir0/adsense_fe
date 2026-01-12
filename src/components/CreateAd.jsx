@@ -106,7 +106,6 @@
 // }
 
 // export default CreateAd;
-
 import React, { useState } from "react";
 import {
   Box,
@@ -148,32 +147,37 @@ function CreateAd({ onAdCreated }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🤖 AI Generator (simple smart logic for now)
+  // 🤖 Improved AI Generator
   const generateWithAI = () => {
-    if (!form.product) {
+    if (!form.product.trim()) {
       toast({
-        title: "Enter product name first",
+        title: "Please enter product name first",
         status: "warning",
+        duration: 2000,
       });
       return;
     }
 
+    const audience = form.audience || "young audience";
+
     setForm((prev) => ({
       ...prev,
-      title: `${prev.product} Influencer Campaign`,
-      description: `We are promoting ${prev.product} for ${prev.audience || "young audience"} to increase brand visibility and engagement.`,
-      usp: "High quality, trending and affordable",
+      title: `${prev.product} Influencer Marketing Campaign`,
+      description: `We are launching ${prev.product} targeted towards ${audience}. The campaign focuses on engaging content and strong brand visibility.`,
+      usp: "High quality, affordable and trending product",
       objective: "Brand Awareness",
       platform: "Instagram",
       ageGroup: "18-34",
       deliverables: "1 Reel + 2 Stories",
-      hashtags: "#adchain #viral #trending",
+      hashtags: "#adchain #viral #influencermarketing",
       minFollowers: "10000",
+      influencersRequired: prev.influencersRequired || "5",
     }));
 
     toast({
-      title: "AI generated campaign ✨",
+      title: "AI generated campaign successfully 🤖✨",
       status: "success",
+      duration: 2000,
     });
   };
 
@@ -182,7 +186,7 @@ function CreateAd({ onAdCreated }) {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://ad-chain-backend.vercel.app/api/ads/create",
+        "https://ad-chain-backend.vercel.app/api/ads", // ✅ FIXED URL
         form,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -191,9 +195,29 @@ function CreateAd({ onAdCreated }) {
 
       toast({ title: "Ad created successfully", status: "success" });
       onAdCreated();
+
+      // Optional: reset form
+      setForm({
+        title: "",
+        objective: "",
+        category: "",
+        product: "",
+        description: "",
+        usp: "",
+        audience: "",
+        ageGroup: "",
+        location: "",
+        platform: "",
+        influencersRequired: "",
+        minFollowers: "",
+        budget: "",
+        deliverables: "",
+        hashtags: "",
+      });
+
     } catch (err) {
-      toast({ title: "Error creating ad", status: "error" });
       console.error(err);
+      toast({ title: "Error creating ad", status: "error" });
     }
   };
 
@@ -241,7 +265,7 @@ function CreateAd({ onAdCreated }) {
         <Heading size="sm">Target Audience</Heading>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-          <Input placeholder="Audience Type (students, gamers)" name="audience" value={form.audience} onChange={handleChange} />
+          <Input placeholder="Audience Type" name="audience" value={form.audience} onChange={handleChange} />
           <Select name="ageGroup" value={form.ageGroup} onChange={handleChange}>
             <option value="">Age Group</option>
             <option>13-17</option>
@@ -273,7 +297,7 @@ function CreateAd({ onAdCreated }) {
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
           <Input placeholder="Total Budget ($)" name="budget" value={form.budget} onChange={handleChange} />
-          <Input placeholder="Deliverables (1 Reel + 2 Stories)" name="deliverables" value={form.deliverables} onChange={handleChange} />
+          <Input placeholder="Deliverables" name="deliverables" value={form.deliverables} onChange={handleChange} />
         </SimpleGrid>
 
         <Input placeholder="Hashtags" name="hashtags" value={form.hashtags} onChange={handleChange} />
@@ -287,4 +311,3 @@ function CreateAd({ onAdCreated }) {
 }
 
 export default CreateAd;
-
