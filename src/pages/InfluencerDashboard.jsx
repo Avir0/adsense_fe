@@ -294,7 +294,6 @@
 // }
 
 // export default InfluencerDashboard;
-
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -341,6 +340,7 @@ function InfluencerDashboard() {
 
   const token = localStorage.getItem("token");
 
+  // Fetch feed ads
   const fetchAds = async () => {
     const res = await axios.get("https://ad-chain-backend.vercel.app/api/ads", {
       headers: { Authorization: `Bearer ${token}` },
@@ -348,14 +348,16 @@ function InfluencerDashboard() {
     setAds(res.data);
   };
 
+  // Fetch accepted ads properly
   const fetchAcceptedAds = async () => {
-    const res = await axios.get(
-      "https://ad-chain-backend.vercel.app/api/ads/my-ads",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const res = await axios.get("https://ad-chain-backend.vercel.app/api/ads", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     const mine = res.data.filter((ad) =>
-      ad.influencers?.some((i) => i.influencer?._id === user._id)
+      ad.influencers?.some(
+        (i) => i.influencer?._id === user._id
+      )
     );
 
     setAcceptedAds(mine);
@@ -375,7 +377,7 @@ function InfluencerDashboard() {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast({ title: "Campaign accepted", status: "success" });
+      toast({ title: "Ad accepted", status: "success" });
       fetchAds();
       fetchAcceptedAds();
     } catch {
@@ -396,7 +398,7 @@ function InfluencerDashboard() {
       setSelectedAd(null);
       fetchAcceptedAds();
     } catch {
-      toast({ title: "Failed to submit proof", status: "error" });
+      toast({ title: "Proof submission failed", status: "error" });
     }
   };
 
@@ -417,37 +419,28 @@ function InfluencerDashboard() {
         {/* Welcome */}
         <Box bg="white" p={5} borderRadius="xl" mb={6}>
           <Text fontSize="lg">
-            Welcome back, <b>{user?.name}</b> 👋
+            Welcome, <b>{user?.name}</b> 👋
           </Text>
           <Text fontSize="sm" color="gray.600">
-            Your categories: {user?.categories?.join(", ")}
+            Categories: {user?.categories?.join(", ")}
           </Text>
         </Box>
 
-        {/* Available Campaigns */}
-        <Heading size="md" mb={4}>
-          📢 Available Campaigns
-        </Heading>
+        {/* FEED */}
+        <Heading size="md" mb={4}>Available Campaigns</Heading>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
           {ads.map((ad) => (
-            <Box key={ad._id} bg="white" p={5} borderRadius="xl" boxShadow="sm">
+            <Box key={ad._id} bg="white" p={5} borderRadius="xl">
               <Heading size="sm">{ad.title}</Heading>
-              <Text fontSize="sm" color="gray.600" mt={1}>
-                {ad.description}
-              </Text>
+              <Text fontSize="sm" color="gray.600">{ad.description}</Text>
 
-              <HStack justify="space-between" mt={3}>
-                <Badge colorScheme="purple">${ad.budget}</Badge>
+              <HStack justify="space-between" mt={2}>
+                <Badge>${ad.budget}</Badge>
                 <Badge>{ad.category}</Badge>
               </HStack>
 
-              <Button
-                mt={4}
-                colorScheme="blue"
-                width="full"
-                onClick={() => handleAcceptAd(ad._id)}
-              >
+              <Button mt={3} width="full" onClick={() => handleAcceptAd(ad._id)}>
                 Accept Campaign
               </Button>
             </Box>
@@ -455,26 +448,26 @@ function InfluencerDashboard() {
         </SimpleGrid>
       </Box>
 
-      {/* Accepted Drawer */}
+      {/* ACCEPTED ADS DRAWER */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Your Accepted Campaigns</DrawerHeader>
+          <DrawerHeader>Accepted Campaigns</DrawerHeader>
           <DrawerBody>
+            {acceptedAds.length === 0 && <Text>No accepted ads yet.</Text>}
+
             {acceptedAds.map((ad) => {
-              const my = ad.influencers.find(
-                (i) => i.influencer._id === user._id
+              const myEntry = ad.influencers.find(
+                (i) => i.influencer?._id === user._id
               );
 
               return (
                 <Box key={ad._id} bg="gray.50" p={4} borderRadius="lg" mb={4}>
                   <Heading size="sm">{ad.title}</Heading>
 
-                  {my?.proof?.submittedAt ? (
-                    <Badge colorScheme="green" mt={2}>
-                      Proof Submitted
-                    </Badge>
+                  {myEntry?.proof?.submittedAt ? (
+                    <Badge colorScheme="green" mt={2}>Proof Submitted</Badge>
                   ) : (
                     <Button mt={2} size="sm" onClick={() => setSelectedAd(ad)}>
                       Submit Proof
@@ -484,7 +477,7 @@ function InfluencerDashboard() {
                   {selectedAd?._id === ad._id && (
                     <Box mt={3}>
                       <Input
-                        placeholder="Content link"
+                        placeholder="Proof link"
                         value={proofData.link}
                         onChange={(e) =>
                           setProofData({ ...proofData, link: e.target.value })
@@ -516,5 +509,3 @@ function InfluencerDashboard() {
 }
 
 export default InfluencerDashboard;
-
-
