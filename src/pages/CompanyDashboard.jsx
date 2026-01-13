@@ -715,9 +715,6 @@
 // }
 
 // export default CompanyDashboard;
-
-
-
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -741,8 +738,7 @@ import {
   MenuItem,
   Button,
 } from "@chakra-ui/react";
-import { FaUserEdit, FaBars, FaBell, FaEllipsisV } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaEllipsisV } from "react-icons/fa";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
@@ -751,7 +747,6 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 
 function CompanyDashboard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   const [ads, setAds] = useState([]);
   const [search, setSearch] = useState("");
@@ -786,53 +781,6 @@ function CompanyDashboard() {
     }
   };
 
-  const markPaid = async (adId, influencerId) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.patch(
-        `https://ad-chain-backend.vercel.app/api/ads/${adId}/pay/${influencerId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchAds();
-    } catch (err) {
-      console.error("Payment update failed", err);
-    }
-  };
-
-  const exportCSV = () => {
-    const rows = [];
-
-    ads.forEach((ad) => {
-      ad.influencers?.forEach((i) => {
-        rows.push({
-          Campaign: ad.title,
-          Influencer: i.influencer?.name || "",
-          Email: i.influencer?.email || "",
-          Proof: i.proof?.link || "",
-          Likes: i.metrics?.likes || 0,
-          Comments: i.metrics?.comments || 0,
-          Views: i.metrics?.views || 0,
-          AIScore: i.aiScore || 0,
-          Payment: i.paymentStatus || "unpaid",
-        });
-      });
-    });
-
-    if (rows.length === 0) return alert("No data to export");
-
-    const csv = [
-      Object.keys(rows[0]).join(","),
-      ...rows.map((r) => Object.values(r).join(",")),
-    ].join("\n");
-
-    const blob = new Blob([csv]);
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "adchain-report.csv";
-    a.click();
-  };
-
   const filterAds = (status) => {
     return [...ads]
       .filter((ad) =>
@@ -852,14 +800,13 @@ function CompanyDashboard() {
       border="1px solid #eee"
     >
       {/* 3 DOT MENU */}
-      <Box position="absolute" top="10px" right="10px" zIndex="99">
+      <Box position="absolute" top="10px" right="10px">
         <Menu>
           <MenuButton
             as={IconButton}
             icon={<FaEllipsisV />}
             size="sm"
             variant="ghost"
-            aria-label="Options"
           />
           <MenuList>
             <MenuItem color="red.500" onClick={() => deleteAd(ad._id)}>
@@ -874,43 +821,69 @@ function CompanyDashboard() {
       <Text fontSize="sm">Budget: ${ad.budget}</Text>
       <Text fontSize="sm">Category: {ad.category}</Text>
 
-      <Badge mt={2}>{ad.status}</Badge>
+      <Badge
+        mt={2}
+        colorScheme={
+          ad.status === "accepted"
+            ? "green"
+            : ad.status === "rejected"
+            ? "red"
+            : "yellow"
+        }
+      >
+        {ad.status}
+      </Badge>
 
-      {/* MULTIPLE INFLUENCERS TRACKING */}
+      {/* ================= INFLUENCER DETAILS ================= */}
       {ad.influencers?.length > 0 && (
-        <Box mt={4}>
-          <Text fontWeight="bold" fontSize="sm">Influencers:</Text>
+        <Box mt={4} bg="gray.50" p={3} borderRadius="md">
+          <Text fontWeight="bold" fontSize="sm">
+            Accepted By:
+          </Text>
 
-          {ad.influencers.map((i, idx) => (
-            <Box key={idx} mt={2} p={3} bg="gray.50" borderRadius="md">
-              <Text fontSize="sm">👤 {i.influencer?.name}</Text>
-              <Text fontSize="sm">📧 {i.influencer?.email}</Text>
+          {ad.influencers.map((inf, i) => (
+            <Box
+              key={i}
+              mt={2}
+              p={3}
+              bg="white"
+              borderRadius="md"
+              border="1px solid #eee"
+            >
+              <Text fontSize="sm">👤 {inf.influencer?.name}</Text>
+              <Text fontSize="sm">📧 {inf.influencer?.email}</Text>
 
-              {i.proof?.link ? (
+              {inf.proof?.link ? (
                 <>
                   <Text fontSize="sm">
-                    🔗 <a href={i.proof.link} target="_blank" rel="noreferrer">Proof Link</a>
+                    🔗{" "}
+                    <a
+                      href={inf.proof.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "blue" }}
+                    >
+                      View Proof
+                    </a>
                   </Text>
+
                   <Text fontSize="sm">
-                    👍 {i.metrics?.likes || 0} | 💬 {i.metrics?.comments || 0} | 👁 {i.metrics?.views || 0}
+                    👍 {inf.metrics?.likes || 0} | 💬 {inf.metrics?.comments || 0} | 👁 {inf.metrics?.views || 0}
                   </Text>
-                  <Text fontSize="sm">🤖 AI Score: {i.aiScore || 0}%</Text>
+
+                  <Text fontSize="sm">
+                    🤖 AI Score: {inf.aiScore || 0}%
+                  </Text>
                 </>
               ) : (
-                <Text fontSize="sm">⏳ Waiting for proof</Text>
+                <Text fontSize="sm" color="orange.500">
+                  ⏳ Proof not submitted yet
+                </Text>
               )}
 
-              <Badge mt={1}>{i.paymentStatus}</Badge>
-
-              {i.paymentStatus === "unpaid" && (
-                <Button
-                  size="xs"
-                  mt={2}
-                  onClick={() => markPaid(ad._id, i.influencer._id)}
-                >
-                  Mark Paid
-                </Button>
-              )}
+              <Badge mt={2}>
+                Payment: {inf.paymentStatus || "unpaid"}
+              </Badge>
             </Box>
           ))}
         </Box>
@@ -923,12 +896,10 @@ function CompanyDashboard() {
       <Navbar />
 
       <Box bg="gray.50" minH="100vh" p={6}>
-        <Heading mb={4}>Company Dashboard</Heading>
+        <Heading mb={2}>Company Dashboard</Heading>
         <Text mb={6}>Welcome, {user?.name}</Text>
 
         <CreateAd onAdCreated={fetchAds} />
-
-        <Button mt={4} onClick={exportCSV}>Export Report CSV</Button>
 
         <Divider my={6} />
 
@@ -951,19 +922,25 @@ function CompanyDashboard() {
           <TabPanels>
             <TabPanel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {filterAds().map((ad) => <AdCard key={ad._id} ad={ad} />)}
+                {filterAds().map((ad) => (
+                  <AdCard key={ad._id} ad={ad} />
+                ))}
               </SimpleGrid>
             </TabPanel>
 
             <TabPanel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {filterAds("pending").map((ad) => <AdCard key={ad._id} ad={ad} />)}
+                {filterAds("pending").map((ad) => (
+                  <AdCard key={ad._id} ad={ad} />
+                ))}
               </SimpleGrid>
             </TabPanel>
 
             <TabPanel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {filterAds("accepted").map((ad) => <AdCard key={ad._id} ad={ad} />)}
+                {filterAds("accepted").map((ad) => (
+                  <AdCard key={ad._id} ad={ad} />
+                ))}
               </SimpleGrid>
             </TabPanel>
           </TabPanels>
@@ -976,3 +953,5 @@ function CompanyDashboard() {
 }
 
 export default CompanyDashboard;
+
+
