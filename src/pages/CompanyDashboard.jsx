@@ -233,6 +233,8 @@
 // // export default CompanyDashboard;
 
 
+// import { FaEllipsisVertical } from "react-icons/fa6";
+
 // import React, { useState, useEffect } from "react";
 // import {
 //   Box,
@@ -267,8 +269,15 @@
 //   MenuButton,
 //   MenuList,
 //   MenuItem,
+//   Input,
+//   Tabs,
+//   TabList,
+//   TabPanels,
+//   Tab,
+//   TabPanel,
 // } from "@chakra-ui/react";
-// import { FaUserEdit, FaBars, FaBell, FaEllipsisV } from "react-icons/fa";
+// import { FaUserEdit, FaBars, FaBell } from "react-icons/fa";
+// import { FaEllipsisVertical } from "react-icons/fa6";
 // import { useNavigate } from "react-router-dom";
 // import axios from "axios";
 // import Navbar from "../components/Navbar.jsx";
@@ -299,6 +308,7 @@
 //   const [ads, setAds] = useState([]);
 //   const [notifications, setNotifications] = useState([]);
 //   const [unread, setUnread] = useState(0);
+//   const [search, setSearch] = useState("");
 
 //   const fetchAds = async () => {
 //     try {
@@ -355,12 +365,20 @@
 
 //   // ------------------ AI Insights ------------------
 //   const insights = [];
-
 //   if (total === 0) insights.push("🧠 Create your first campaign to unlock insights.");
 //   if (acceptanceRate >= 60) insights.push("🚀 Strong acceptance rate. Increase budget.");
 //   else if (acceptanceRate > 0) insights.push("📉 Improve targeting for better acceptance.");
 //   if (pending >= 3) insights.push("⏳ Too many pending campaigns. Improve clarity.");
 //   if (accepted >= 5) insights.push("💎 You are a top-performing brand!");
+
+//   // ------------------ Filters ------------------
+//   const filteredAds = (status) =>
+//     [...ads]
+//       .filter((ad) =>
+//         ad.title.toLowerCase().includes(search.toLowerCase())
+//       )
+//       .filter((ad) => (status ? ad.status === status : true))
+//       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
 //   return (
 //     <>
@@ -420,109 +438,39 @@
 //           ))}
 //         </SimpleGrid>
 
-//         {/* CHARTS */}
-//         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mb={8}>
-//           <Box bg="white" p={5} borderRadius="xl">
-//             <Heading size="sm">Growth</Heading>
-//             <ResponsiveContainer width="100%" height={250}>
-//               <LineChart data={growthData}>
-//                 <Line type="monotone" dataKey="campaigns" stroke="#3182CE" />
-//                 <CartesianGrid strokeDasharray="3 3" />
-//                 <XAxis dataKey="name" />
-//                 <YAxis />
-//                 <Tooltip />
-//               </LineChart>
-//             </ResponsiveContainer>
-//           </Box>
-
-//           <Box bg="white" p={5} borderRadius="xl">
-//             <Heading size="sm">Status</Heading>
-//             <ResponsiveContainer width="100%" height={250}>
-//               <PieChart>
-//                 <Pie data={statusData} dataKey="value" outerRadius={80} label>
-//                   {statusData.map((_, i) => (
-//                     <Cell key={i} fill={COLORS[i]} />
-//                   ))}
-//                 </Pie>
-//                 <Tooltip />
-//               </PieChart>
-//             </ResponsiveContainer>
-//           </Box>
-//         </SimpleGrid>
-
-//         {/* AI INSIGHTS */}
-//         <Box bg="white" p={6} borderRadius="xl" mb={8}>
-//           <Heading size="md">🤖 AI Insights</Heading>
-//           <VStack align="stretch" mt={3}>
-//             {insights.map((text, i) => (
-//               <Alert key={i} status="info">
-//                 <AlertIcon />
-//                 {text}
-//               </Alert>
-//             ))}
-//           </VStack>
-//         </Box>
-
 //         {/* CREATE */}
 //         <CreateAd onAdCreated={fetchAds} />
 
 //         <Divider my={6} />
 
-//         {/* CAMPAIGNS */}
-//         <Heading size="md" mb={4}>Your Campaigns</Heading>
+//         {/* SEARCH */}
+//         <Input
+//           placeholder="Search campaigns..."
+//           mb={4}
+//           value={search}
+//           onChange={(e) => setSearch(e.target.value)}
+//         />
 
-//         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-//           {[...ads]
-//             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-//             .map((ad) => (
-//               <Box key={ad._id} bg="white" p={4} borderRadius="xl" position="relative">
+//         {/* FILTER TABS */}
+//         <Tabs variant="soft-rounded" colorScheme="brand">
+//           <TabList mb={4}>
+//             <Tab>All</Tab>
+//             <Tab>Pending</Tab>
+//             <Tab>Accepted</Tab>
+//           </TabList>
 
-//                 {/* 3 DOT MENU */}
-//                 <Box position="absolute" top="10px" right="10px">
-//                   <Menu>
-//                     <MenuButton
-//                       as={IconButton}
-//                       icon={<FaEllipsisV />}
-//                       size="sm"
-//                       variant="ghost"
-//                     />
-//                     <MenuList>
-//                       <MenuItem
-//                         color="red.500"
-//                         onClick={async () => {
-//                           try {
-//                             const token = localStorage.getItem("token");
-//                             await axios.delete(
-//                               `https://ad-chain-backend.vercel.app/api/ads/${ad._id}`,
-//                               { headers: { Authorization: `Bearer ${token}` } }
-//                             );
-//                             fetchAds();
-//                           } catch (err) {
-//                             console.error("Delete failed", err);
-//                           }
-//                         }}
-//                       >
-//                         Delete Campaign
-//                       </MenuItem>
-//                     </MenuList>
-//                   </Menu>
-//                 </Box>
-
-//                 <Heading size="sm">{ad.title}</Heading>
-//                 <Text fontSize="sm" color="gray.600">{ad.description}</Text>
-
-//                 <HStack justify="space-between" mt={3}>
-//                   <Text fontSize="sm">₹{ad.budget}</Text>
-//                   <Badge colorScheme={
-//                     ad.status === "accepted" ? "green" :
-//                     ad.status === "rejected" ? "red" : "yellow"
-//                   }>
-//                     {ad.status}
-//                   </Badge>
-//                 </HStack>
-//               </Box>
-//             ))}
-//         </SimpleGrid>
+//           <TabPanels>
+//             <TabPanel>
+//               <CampaignGrid ads={filteredAds()} fetchAds={fetchAds} />
+//             </TabPanel>
+//             <TabPanel>
+//               <CampaignGrid ads={filteredAds("pending")} fetchAds={fetchAds} />
+//             </TabPanel>
+//             <TabPanel>
+//               <CampaignGrid ads={filteredAds("accepted")} fetchAds={fetchAds} />
+//             </TabPanel>
+//           </TabPanels>
+//         </Tabs>
 //       </Box>
 
 //       <Footer />
@@ -530,12 +478,60 @@
 //   );
 // }
 
+// // ---------------- COMPONENT FOR ADS GRID ----------------
+// function CampaignGrid({ ads, fetchAds }) {
+//   return (
+//     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+//       {ads.map((ad) => (
+//         <Box key={ad._id} bg="white" p={4} borderRadius="xl" position="relative">
+
+//           {/* 3 DOT MENU */}
+//           <Box position="absolute" top="8px" right="8px" zIndex="10">
+//             <Menu>
+//               <MenuButton
+//                 as={IconButton}
+//                 icon={<FaEllipsisVertical />}
+//                 size="sm"
+//                 variant="ghost"
+//                 aria-label="Options"
+//               />
+//               <MenuList>
+//                 <MenuItem
+//                   color="red.500"
+//                   onClick={async () => {
+//                     const token = localStorage.getItem("token");
+//                     await axios.delete(
+//                       `https://ad-chain-backend.vercel.app/api/ads/${ad._id}`,
+//                       { headers: { Authorization: `Bearer ${token}` } }
+//                     );
+//                     fetchAds();
+//                   }}
+//                 >
+//                   Delete Campaign
+//                 </MenuItem>
+//               </MenuList>
+//             </Menu>
+//           </Box>
+
+//           <Heading size="sm">{ad.title}</Heading>
+//           <Text fontSize="sm" color="gray.600">{ad.description}</Text>
+
+//           <HStack justify="space-between" mt={3}>
+//             <Text fontSize="sm">₹{ad.budget}</Text>
+//             <Badge colorScheme={
+//               ad.status === "accepted" ? "green" :
+//               ad.status === "rejected" ? "red" : "yellow"
+//             }>
+//               {ad.status}
+//             </Badge>
+//           </HStack>
+//         </Box>
+//       ))}
+//     </SimpleGrid>
+//   );
+// }
+
 // export default CompanyDashboard;
-
-
-// export default CompanyDashboard;
-
-import { FaEllipsisVertical } from "react-icons/fa6";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -548,38 +544,18 @@ import {
   Badge,
   SimpleGrid,
   Divider,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  Alert,
-  AlertIcon,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  useDisclosure,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverCloseButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Input,
   Tabs,
   TabList,
   TabPanels,
   Tab,
   TabPanel,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
-import { FaUserEdit, FaBars, FaBell } from "react-icons/fa";
-import { FaEllipsisVertical } from "react-icons/fa6";
+import { FaUserEdit, FaBars, FaBell, FaEllipsisV } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
@@ -587,29 +563,11 @@ import Footer from "../components/Footer.jsx";
 import CreateAd from "../components/CreateAd.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-
-const COLORS = ["#38A169", "#ECC94B", "#E53E3E"];
-
 function CompanyDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [ads, setAds] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [unread, setUnread] = useState(0);
   const [search, setSearch] = useState("");
 
   const fetchAds = async () => {
@@ -625,125 +583,93 @@ function CompanyDashboard() {
     }
   };
 
-  const fetchNotifications = async () => {
+  useEffect(() => {
+    fetchAds();
+  }, []);
+
+  const deleteAd = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        "https://ad-chain-backend.vercel.app/api/users/notifications",
+      await axios.delete(
+        `https://ad-chain-backend.vercel.app/api/ads/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setNotifications(res.data);
-      setUnread(res.data.length);
+      fetchAds();
     } catch (err) {
-      console.error(err);
+      console.error("Delete failed", err);
     }
   };
 
-  useEffect(() => {
-    fetchAds();
-    fetchNotifications();
-  }, []);
-
-  // ------------------ Analytics ------------------
-  const total = ads.length;
-  const accepted = ads.filter((a) => a.status === "accepted").length;
-  const pending = ads.filter((a) => a.status === "pending").length;
-  const rejected = ads.filter((a) => a.status === "rejected").length;
-
-  const revenue = accepted * 500;
-  const acceptanceRate = total > 0 ? Math.round((accepted / total) * 100) : 0;
-
-  // ------------------ Charts Data ------------------
-  const statusData = [
-    { name: "Accepted", value: accepted },
-    { name: "Pending", value: pending },
-    { name: "Rejected", value: rejected },
-  ];
-
-  const growthData = ads.map((_, i) => ({
-    name: `C${i + 1}`,
-    campaigns: i + 1,
-  }));
-
-  // ------------------ AI Insights ------------------
-  const insights = [];
-  if (total === 0) insights.push("🧠 Create your first campaign to unlock insights.");
-  if (acceptanceRate >= 60) insights.push("🚀 Strong acceptance rate. Increase budget.");
-  else if (acceptanceRate > 0) insights.push("📉 Improve targeting for better acceptance.");
-  if (pending >= 3) insights.push("⏳ Too many pending campaigns. Improve clarity.");
-  if (accepted >= 5) insights.push("💎 You are a top-performing brand!");
-
-  // ------------------ Filters ------------------
-  const filteredAds = (status) =>
-    [...ads]
+  const filterAds = (status) => {
+    return [...ads]
       .filter((ad) =>
         ad.title.toLowerCase().includes(search.toLowerCase())
       )
       .filter((ad) => (status ? ad.status === status : true))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  };
+
+  const AdCard = ({ ad }) => (
+    <Box
+      bg="white"
+      p={5}
+      borderRadius="lg"
+      boxShadow="sm"
+      position="relative"
+      border="1px solid #eee"
+    >
+      {/* 3 DOT MENU */}
+      <Box position="absolute" top="10px" right="10px" zIndex="99">
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            icon={<FaEllipsisV />}
+            size="sm"
+            variant="ghost"
+            aria-label="Options"
+          />
+          <MenuList>
+            <MenuItem color="red.500" onClick={() => deleteAd(ad._id)}>
+              Delete Campaign
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Box>
+
+      <Heading size="sm" mb={2}>{ad.title}</Heading>
+      <Text fontSize="sm" mb={1}>{ad.description}</Text>
+      <Text fontSize="sm">Budget: ${ad.budget}</Text>
+      <Text fontSize="sm">Category: {ad.category}</Text>
+
+      <Badge
+        mt={2}
+        colorScheme={
+          ad.status === "accepted"
+            ? "green"
+            : ad.status === "rejected"
+            ? "red"
+            : "yellow"
+        }
+      >
+        {ad.status}
+      </Badge>
+    </Box>
+  );
 
   return (
     <>
       <Navbar />
 
       <Box bg="gray.50" minH="100vh" p={6}>
+        <Heading mb={4}>Company Dashboard</Heading>
 
-        {/* HEADER */}
-        <HStack justify="space-between" mb={6}>
-          <HStack>
-            <IconButton icon={<FaBars />} onClick={onOpen} />
-            <Heading size="lg">Company Dashboard</Heading>
-          </HStack>
+        <Text mb={6}>Welcome, {user?.name}</Text>
 
-          <HStack spacing={4}>
-            <Popover>
-              <PopoverTrigger>
-                <Box position="relative">
-                  <IconButton icon={<FaBell />} />
-                  {unread > 0 && (
-                    <Badge position="absolute" top="-1" right="-1" colorScheme="red">
-                      {unread}
-                    </Badge>
-                  )}
-                </Box>
-              </PopoverTrigger>
-              <PopoverContent>
-                <PopoverHeader>Notifications</PopoverHeader>
-                <PopoverCloseButton />
-                <PopoverBody>
-                  {notifications.map((n, i) => (
-                    <Text key={i}>{n.message}</Text>
-                  ))}
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
-
-            <IconButton icon={<FaUserEdit />} onClick={() => navigate("/company/profile")} />
-          </HStack>
-        </HStack>
-
-        {/* KPI */}
-        <SimpleGrid columns={{ base: 1, md: 4 }} spacing={4} mb={6}>
-          {[
-            { label: "Total Campaigns", value: total },
-            { label: "Accepted", value: accepted },
-            { label: "Pending", value: pending },
-            { label: "Revenue (demo)", value: `₹${revenue}` },
-          ].map((item, i) => (
-            <Box key={i} bg="white" p={5} borderRadius="xl">
-              <Stat>
-                <StatLabel>{item.label}</StatLabel>
-                <StatNumber>{item.value}</StatNumber>
-                <StatHelpText>Overview</StatHelpText>
-              </Stat>
-            </Box>
-          ))}
-        </SimpleGrid>
-
-        {/* CREATE */}
         <CreateAd onAdCreated={fetchAds} />
 
         <Divider my={6} />
+
+        <Heading size="md" mb={4}>Your Ads</Heading>
 
         {/* SEARCH */}
         <Input
@@ -754,7 +680,7 @@ function CompanyDashboard() {
         />
 
         {/* FILTER TABS */}
-        <Tabs variant="soft-rounded" colorScheme="brand">
+        <Tabs variant="soft-rounded" colorScheme="blue">
           <TabList mb={4}>
             <Tab>All</Tab>
             <Tab>Pending</Tab>
@@ -763,13 +689,21 @@ function CompanyDashboard() {
 
           <TabPanels>
             <TabPanel>
-              <CampaignGrid ads={filteredAds()} fetchAds={fetchAds} />
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                {filterAds().map((ad) => <AdCard key={ad._id} ad={ad} />)}
+              </SimpleGrid>
             </TabPanel>
+
             <TabPanel>
-              <CampaignGrid ads={filteredAds("pending")} fetchAds={fetchAds} />
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                {filterAds("pending").map((ad) => <AdCard key={ad._id} ad={ad} />)}
+              </SimpleGrid>
             </TabPanel>
+
             <TabPanel>
-              <CampaignGrid ads={filteredAds("accepted")} fetchAds={fetchAds} />
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                {filterAds("accepted").map((ad) => <AdCard key={ad._id} ad={ad} />)}
+              </SimpleGrid>
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -780,58 +714,4 @@ function CompanyDashboard() {
   );
 }
 
-// ---------------- COMPONENT FOR ADS GRID ----------------
-function CampaignGrid({ ads, fetchAds }) {
-  return (
-    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-      {ads.map((ad) => (
-        <Box key={ad._id} bg="white" p={4} borderRadius="xl" position="relative">
-
-          {/* 3 DOT MENU */}
-          <Box position="absolute" top="8px" right="8px" zIndex="10">
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                icon={<FaEllipsisVertical />}
-                size="sm"
-                variant="ghost"
-                aria-label="Options"
-              />
-              <MenuList>
-                <MenuItem
-                  color="red.500"
-                  onClick={async () => {
-                    const token = localStorage.getItem("token");
-                    await axios.delete(
-                      `https://ad-chain-backend.vercel.app/api/ads/${ad._id}`,
-                      { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    fetchAds();
-                  }}
-                >
-                  Delete Campaign
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Box>
-
-          <Heading size="sm">{ad.title}</Heading>
-          <Text fontSize="sm" color="gray.600">{ad.description}</Text>
-
-          <HStack justify="space-between" mt={3}>
-            <Text fontSize="sm">₹{ad.budget}</Text>
-            <Badge colorScheme={
-              ad.status === "accepted" ? "green" :
-              ad.status === "rejected" ? "red" : "yellow"
-            }>
-              {ad.status}
-            </Badge>
-          </HStack>
-        </Box>
-      ))}
-    </SimpleGrid>
-  );
-}
-
 export default CompanyDashboard;
-
