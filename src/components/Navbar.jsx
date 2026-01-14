@@ -100,7 +100,7 @@ const Navbar = ({ footerRef }) => {
       >
         <Flex alignItems="center">
           <Image src={logo} boxSize="40px" borderRadius="md" mr={2} />
-          <Heading size="md" color="white">Adchain</Heading>
+          <Heading size="md" color="white">Adchain AI</Heading>
         </Flex>
 
         <IconButton
