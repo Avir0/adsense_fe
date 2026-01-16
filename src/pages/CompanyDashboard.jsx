@@ -739,6 +739,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { FaEllipsisV } from "react-icons/fa";
+import { FaChartBar } from "react-icons/fa";
+
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
