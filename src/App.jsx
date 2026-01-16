@@ -168,7 +168,6 @@
 
 // export default App;
 
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ChakraProvider, extendTheme, Spinner, Center } from '@chakra-ui/react';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -176,14 +175,11 @@ import { useAuth } from './contexts/AuthContext.jsx';
 import Home from './pages/Home.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
-
 import InfluencerDashboard from './pages/InfluencerDashboard.jsx';
 import CompanyDashboard from './pages/CompanyDashboard.jsx';
 import InfluencerProfile from './pages/InfluencerProfile.jsx';
 import CompanyProfile from './pages/CompanyProfile.jsx';
-
-// ✅ NEW
-import AnalyticsDashboard from './pages/AnalyticsDashboard.jsx';
+import AnalyticsDashboard from './pages/AnalyticsDashboard.jsx'; // ✅ NEW IMPORT
 
 const theme = extendTheme({
   colors: {
@@ -220,17 +216,34 @@ function App() {
     <ChakraProvider theme={theme}>
       <Router>
         <Routes>
-          {/* Public */}
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 
-          {/* Influencer */}
           <Route
             path="/influencer/dashboard"
             element={
               <ProtectedRoute role="influencer">
                 <InfluencerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/company/dashboard"
+            element={
+              <ProtectedRoute role="company">
+                <CompanyDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ NEW ANALYTICS ROUTE */}
+          <Route
+            path="/company/analytics"
+            element={
+              <ProtectedRoute role="company">
+                <AnalyticsDashboard />
               </ProtectedRoute>
             }
           />
@@ -244,31 +257,11 @@ function App() {
             }
           />
 
-          {/* Company */}
-          <Route
-            path="/company/dashboard"
-            element={
-              <ProtectedRoute role="company">
-                <CompanyDashboard />
-              </ProtectedRoute>
-            }
-          />
-
           <Route
             path="/company/profile"
             element={
               <ProtectedRoute role="company">
                 <CompanyProfile />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* ✅ NEW Analytics Route */}
-          <Route
-            path="/company/analytics"
-            element={
-              <ProtectedRoute role="company">
-                <AnalyticsDashboard />
               </ProtectedRoute>
             }
           />
