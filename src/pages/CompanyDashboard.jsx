@@ -715,6 +715,247 @@
 // }
 
 // export default CompanyDashboard;
+// import React, { useState, useEffect } from "react";
+// import {
+//   Box,
+//   Heading,
+//   Text,
+//   VStack,
+//   HStack,
+//   IconButton,
+//   Badge,
+//   SimpleGrid,
+//   Divider,
+//   Input,
+//   Tabs,
+//   TabList,
+//   TabPanels,
+//   Tab,
+//   TabPanel,
+//   Menu,
+//   MenuButton,
+//   MenuList,
+//   MenuItem,
+//   Button,
+// } from "@chakra-ui/react";
+// import { FaEllipsisV } from "react-icons/fa";
+// import { FaChartBar } from "react-icons/fa";
+
+// import axios from "axios";
+// import Navbar from "../components/Navbar.jsx";
+// import Footer from "../components/Footer.jsx";
+// import CreateAd from "../components/CreateAd.jsx";
+// import { useAuth } from "../contexts/AuthContext.jsx";
+
+// function CompanyDashboard() {
+//   const { user } = useAuth();
+
+//   const [ads, setAds] = useState([]);
+//   const [search, setSearch] = useState("");
+
+//   const fetchAds = async () => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       const res = await axios.get(
+//         "https://ad-chain-backend.vercel.app/api/ads/my-ads",
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       setAds(res.data);
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchAds();
+//   }, []);
+
+//   const deleteAd = async (id) => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       await axios.delete(
+//         `https://ad-chain-backend.vercel.app/api/ads/${id}`,
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       fetchAds();
+//     } catch (err) {
+//       console.error("Delete failed", err);
+//     }
+//   };
+
+//   const filterAds = (status) => {
+//     return [...ads]
+//       .filter((ad) =>
+//         ad.title.toLowerCase().includes(search.toLowerCase())
+//       )
+//       .filter((ad) => (status ? ad.status === status : true))
+//       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+//   };
+
+//   const AdCard = ({ ad }) => (
+//     <Box
+//       bg="white"
+//       p={5}
+//       borderRadius="lg"
+//       boxShadow="sm"
+//       position="relative"
+//       border="1px solid #eee"
+//     >
+//       {/* 3 DOT MENU */}
+//       <Box position="absolute" top="10px" right="10px">
+//         <Menu>
+//           <MenuButton
+//             as={IconButton}
+//             icon={<FaEllipsisV />}
+//             size="sm"
+//             variant="ghost"
+//           />
+//           <MenuList>
+//             <MenuItem color="red.500" onClick={() => deleteAd(ad._id)}>
+//               Delete Campaign
+//             </MenuItem>
+//           </MenuList>
+//         </Menu>
+//       </Box>
+
+//       <Heading size="sm" mb={2}>{ad.title}</Heading>
+//       <Text fontSize="sm" mb={1}>{ad.description}</Text>
+//       <Text fontSize="sm">Budget: ${ad.budget}</Text>
+//       <Text fontSize="sm">Category: {ad.category}</Text>
+
+//       <Badge
+//         mt={2}
+//         colorScheme={
+//           ad.status === "accepted"
+//             ? "green"
+//             : ad.status === "rejected"
+//             ? "red"
+//             : "yellow"
+//         }
+//       >
+//         {ad.status}
+//       </Badge>
+
+//       {/* ================= INFLUENCER DETAILS ================= */}
+//       {ad.influencers?.length > 0 && (
+//         <Box mt={4} bg="gray.50" p={3} borderRadius="md">
+//           <Text fontWeight="bold" fontSize="sm">
+//             Accepted By:
+//           </Text>
+
+//           {ad.influencers.map((inf, i) => (
+//             <Box
+//               key={i}
+//               mt={2}
+//               p={3}
+//               bg="white"
+//               borderRadius="md"
+//               border="1px solid #eee"
+//             >
+//               <Text fontSize="sm">👤 {inf.influencer?.name}</Text>
+//               <Text fontSize="sm">📧 {inf.influencer?.email}</Text>
+
+//               {inf.proof?.link ? (
+//                 <>
+//                   <Text fontSize="sm">
+//                     🔗{" "}
+//                     <a
+//                       href={inf.proof.link}
+//                       target="_blank"
+//                       rel="noreferrer"
+//                       style={{ color: "blue" }}
+//                     >
+//                       View Proof
+//                     </a>
+//                   </Text>
+
+//                   <Text fontSize="sm">
+//                     👍 {inf.metrics?.likes || 0} | 💬 {inf.metrics?.comments || 0} | 👁 {inf.metrics?.views || 0}
+//                   </Text>
+
+//                   <Text fontSize="sm">
+//                     🤖 AI Score: {inf.aiScore || 0}%
+//                   </Text>
+//                 </>
+//               ) : (
+//                 <Text fontSize="sm" color="orange.500">
+//                   ⏳ Proof not submitted yet
+//                 </Text>
+//               )}
+
+//               <Badge mt={2}>
+//                 Payment: {inf.paymentStatus || "unpaid"}
+//               </Badge>
+//             </Box>
+//           ))}
+//         </Box>
+//       )}
+//     </Box>
+//   );
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <Box bg="gray.50" minH="100vh" p={6}>
+//         <Heading mb={2}>Company Dashboard</Heading>
+//         <Text mb={6}>Welcome, {user?.name}</Text>
+
+//         <CreateAd onAdCreated={fetchAds} />
+
+//         <Divider my={6} />
+
+//         <Heading size="md" mb={4}>Your Ads</Heading>
+
+//         <Input
+//           placeholder="Search campaigns..."
+//           mb={4}
+//           value={search}
+//           onChange={(e) => setSearch(e.target.value)}
+//         />
+
+//         <Tabs variant="soft-rounded" colorScheme="blue">
+//           <TabList mb={4}>
+//             <Tab>All</Tab>
+//             <Tab>Pending</Tab>
+//             <Tab>Accepted</Tab>
+//           </TabList>
+
+//           <TabPanels>
+//             <TabPanel>
+//               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+//                 {filterAds().map((ad) => (
+//                   <AdCard key={ad._id} ad={ad} />
+//                 ))}
+//               </SimpleGrid>
+//             </TabPanel>
+
+//             <TabPanel>
+//               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+//                 {filterAds("pending").map((ad) => (
+//                   <AdCard key={ad._id} ad={ad} />
+//                 ))}
+//               </SimpleGrid>
+//             </TabPanel>
+
+//             <TabPanel>
+//               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+//                 {filterAds("accepted").map((ad) => (
+//                   <AdCard key={ad._id} ad={ad} />
+//                 ))}
+//               </SimpleGrid>
+//             </TabPanel>
+//           </TabPanels>
+//         </Tabs>
+//       </Box>
+
+//       <Footer />
+//     </>
+//   );
+// }
+
+// export default CompanyDashboard;
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -736,11 +977,9 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Button,
 } from "@chakra-ui/react";
-import { FaEllipsisV } from "react-icons/fa";
-import { FaChartBar } from "react-icons/fa";
-
+import { FaEllipsisV, FaChartBar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
@@ -749,6 +988,7 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 
 function CompanyDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [ads, setAds] = useState([]);
   const [search, setSearch] = useState("");
@@ -792,6 +1032,16 @@ function CompanyDashboard() {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   };
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const AdCard = ({ ad }) => (
     <Box
       bg="white"
@@ -818,7 +1068,11 @@ function CompanyDashboard() {
         </Menu>
       </Box>
 
-      <Heading size="sm" mb={2}>{ad.title}</Heading>
+      <Heading size="sm" mb={1}>{ad.title}</Heading>
+      <Text fontSize="xs" color="gray.500" mb={2}>
+        🕒 Posted on {formatDate(ad.createdAt)}
+      </Text>
+
       <Text fontSize="sm" mb={1}>{ad.description}</Text>
       <Text fontSize="sm">Budget: ${ad.budget}</Text>
       <Text fontSize="sm">Category: {ad.category}</Text>
@@ -898,8 +1152,21 @@ function CompanyDashboard() {
       <Navbar />
 
       <Box bg="gray.50" minH="100vh" p={6}>
-        <Heading mb={2}>Company Dashboard</Heading>
-        <Text mb={6}>Welcome, {user?.name}</Text>
+
+        {/* HEADER */}
+        <HStack justify="space-between" mb={6}>
+          <Box>
+            <Heading mb={1}>Company Dashboard</Heading>
+            <Text>Welcome, {user?.name}</Text>
+          </Box>
+
+          <IconButton
+            icon={<FaChartBar />}
+            colorScheme="blue"
+            aria-label="Analytics"
+            onClick={() => navigate("/company/analytics")}
+          />
+        </HStack>
 
         <CreateAd onAdCreated={fetchAds} />
 
@@ -924,25 +1191,19 @@ function CompanyDashboard() {
           <TabPanels>
             <TabPanel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {filterAds().map((ad) => (
-                  <AdCard key={ad._id} ad={ad} />
-                ))}
+                {filterAds().map((ad) => <AdCard key={ad._id} ad={ad} />)}
               </SimpleGrid>
             </TabPanel>
 
             <TabPanel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {filterAds("pending").map((ad) => (
-                  <AdCard key={ad._id} ad={ad} />
-                ))}
+                {filterAds("pending").map((ad) => <AdCard key={ad._id} ad={ad} />)}
               </SimpleGrid>
             </TabPanel>
 
             <TabPanel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                {filterAds("accepted").map((ad) => (
-                  <AdCard key={ad._id} ad={ad} />
-                ))}
+                {filterAds("accepted").map((ad) => <AdCard key={ad._id} ad={ad} />)}
               </SimpleGrid>
             </TabPanel>
           </TabPanels>
@@ -955,5 +1216,4 @@ function CompanyDashboard() {
 }
 
 export default CompanyDashboard;
-
 
