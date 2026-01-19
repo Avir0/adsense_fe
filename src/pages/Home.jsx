@@ -596,8 +596,6 @@
 // export default Home;
 
 
-
-
 import React from "react";
 import {
   Box,
@@ -620,195 +618,203 @@ import { Link as RouterLink } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 
-export default function Home() {
-  const bg = useColorModeValue("gray.50", "gray.900");
-  const cardBg = useColorModeValue("white", "gray.800");
+const Home = () => {
+  const bgGradient = "linear(to-br, #ff6a4a, #ff9f43)";
+  const softBg = useColorModeValue("gray.50", "gray.900");
+
+  const stats = [
+    { value: "10,000+", label: "Active Influencers" },
+    { value: "2,500+", label: "Brand Partners" },
+    { value: "$5M+", label: "Paid to Creators" },
+    { value: "95%", label: "Satisfaction Rate" },
+  ];
+
+  const features = [
+    {
+      icon: FaSearch,
+      title: "Smart Matching",
+      text: "AI-powered matching connects brands with the most relevant creators.",
+    },
+    {
+      icon: FaChartLine,
+      title: "Performance Analytics",
+      text: "Track campaign ROI, engagement, reach, and conversions in real-time.",
+    },
+    {
+      icon: FaHandshake,
+      title: "Secure Payments",
+      text: "Built-in payment tracking ensures transparency for brands and creators.",
+    },
+  ];
 
   return (
-    <Box bg={bg}>
+    <Box w="100%" overflowX="hidden">
       <Navbar />
 
-      {/* HERO */}
-      <Container maxW="7xl" py={{ base: 14, md: 20 }}>
-        <Flex
-          direction={{ base: "column", md: "row" }}
-          align="center"
-          gap={10}
-        >
-          <Box flex="1">
-            <Badge colorScheme="orange" mb={3}>
-              🚀 AI Powered Influencer Platform
-            </Badge>
-
-            <Heading fontSize={{ base: "3xl", md: "5xl" }} mb={4}>
-              Grow your brand with <br />
-              <Text as="span" color="orange.500">
-                smart influencer marketing
-              </Text>
-            </Heading>
-
-            <Text fontSize="lg" color="gray.600" mb={6}>
-              Adchain helps companies launch data-driven campaigns, track real
-              performance, and collaborate with trusted influencers.
-            </Text>
-
-            <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
-              <Button
-                as={RouterLink}
-                to="/signup"
-                colorScheme="orange"
-                size="lg"
-                rightIcon={<FaArrowRight />}
+      {/* ================= HERO ================= */}
+      <Box bgGradient={bgGradient} color="white">
+        <Container maxW="7xl" px={{ base: 5, md: 10 }} py={{ base: 14, md: 20 }}>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            align="center"
+            gap={10}
+          >
+            <Box flex={1}>
+              <Heading
+                fontSize={{ base: "32px", md: "56px" }}
+                lineHeight="1.1"
+                mb={5}
               >
-                Get Started
-              </Button>
-
-              <Button
-                as={RouterLink}
-                to="/login"
-                size="lg"
-                variant="outline"
-              >
-                Login
-              </Button>
-            </Stack>
-          </Box>
-
-          <Box flex="1">
-            <Image
-              src="https://illustrations.popsy.co/amber/digital-nomad.svg"
-              w="100%"
-              maxW="500px"
-              mx="auto"
-            />
-          </Box>
-        </Flex>
-      </Container>
-
-      {/* STATS */}
-      <Container maxW="6xl" pb={14}>
-        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8}>
-          {[
-            ["10k+", "Influencers"],
-            ["2500+", "Brands"],
-            ["₹5Cr+", "Paid to Creators"],
-            ["98%", "Success Rate"],
-          ].map(([value, label]) => (
-            <Box key={label} textAlign="center">
-              <Heading size="lg" color="orange.500">
-                {value}
+                Connect Brands with <br /> Authentic Influencers
               </Heading>
-              <Text color="gray.600">{label}</Text>
-            </Box>
-          ))}
-        </SimpleGrid>
-      </Container>
 
-      {/* FEATURES */}
-      <Container maxW="6xl" py={16}>
-        <Heading textAlign="center" mb={10}>
-          Why companies choose Adchain
+              <Text
+                fontSize={{ base: "md", md: "xl" }}
+                opacity={0.95}
+                maxW="520px"
+                mb={8}
+              >
+                A modern influencer marketing platform helping brands scale with
+                data-driven creator collaborations.
+              </Text>
+
+              <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
+                <Button
+                  as={RouterLink}
+                  to="/signup"
+                  size="lg"
+                  bg="white"
+                  color="black"
+                  _hover={{ bg: "gray.100" }}
+                  rightIcon={<FaArrowRight />}
+                >
+                  Get Started
+                </Button>
+
+                <Button
+                  as={RouterLink}
+                  to="/login"
+                  size="lg"
+                  variant="outline"
+                  color="white"
+                  borderColor="white"
+                  _hover={{ bg: "whiteAlpha.200" }}
+                >
+                  Login
+                </Button>
+              </Stack>
+            </Box>
+
+            <Box flex={1} textAlign="center">
+              <Image
+                src="https://illustrations.popsy.co/amber/digital-nomad.svg"
+                maxW={{ base: "280px", md: "520px" }}
+                mx="auto"
+              />
+            </Box>
+          </Flex>
+        </Container>
+      </Box>
+
+      {/* ================= STATS ================= */}
+      <Box bg={softBg}>
+        <Container maxW="7xl" px={5} py={14}>
+          <SimpleGrid columns={{ base: 2, md: 4 }} spacing={10}>
+            {stats.map((s) => (
+              <Box key={s.label} textAlign="center">
+                <Heading fontSize={{ base: "28px", md: "40px" }}>
+                  {s.value}
+                </Heading>
+                <Text color="gray.500">{s.label}</Text>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* ================= FEATURES ================= */}
+      <Container maxW="7xl" px={5} py={20}>
+        <Heading textAlign="center" mb={12}>
+          Why Companies Choose Adchain
         </Heading>
 
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
-          {[
-            {
-              icon: FaSearch,
-              title: "Smart Matching",
-              text: "AI finds the best influencers for your product niche.",
-            },
-            {
-              icon: FaChartLine,
-              title: "Live Analytics",
-              text: "Track performance, ROI, engagement & growth.",
-            },
-            {
-              icon: FaHandshake,
-              title: "Trusted Network",
-              text: "Verified influencers with history & reputation.",
-            },
-          ].map((item, i) => (
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
+          {features.map((f, i) => (
             <Box
               key={i}
-              bg={cardBg}
               p={8}
-              borderRadius="xl"
-              boxShadow="sm"
-              border="1px solid #eee"
-              _hover={{ transform: "translateY(-4px)", boxShadow: "md" }}
-              transition="0.2s"
+              borderRadius="2xl"
+              bg="white"
+              boxShadow="lg"
             >
-              <Icon as={item.icon} w={8} h={8} color="orange.500" mb={4} />
+              <Icon as={f.icon} fontSize="28px" color="orange.400" mb={4} />
               <Heading size="md" mb={2}>
-                {item.title}
+                {f.title}
               </Heading>
-              <Text color="gray.600">{item.text}</Text>
+              <Text color="gray.600">{f.text}</Text>
             </Box>
           ))}
         </SimpleGrid>
       </Container>
 
-      {/* TESTIMONIAL */}
-      <Container maxW="6xl" py={16}>
-        <Heading textAlign="center" mb={10}>
-          Trusted by founders & creators
-        </Heading>
+      {/* ================= HOW IT WORKS ================= */}
+      <Box bg={softBg}>
+        <Container maxW="7xl" px={5} py={20}>
+          <Heading textAlign="center" mb={12}>
+            How It Works
+          </Heading>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
-          {[
-            {
-              name: "Aman Verma",
-              role: "Startup Founder",
-              text: "Adchain helped us scale influencer campaigns with real ROI tracking.",
-            },
-            {
-              name: "Simran Kaur",
-              role: "Lifestyle Influencer",
-              text: "This platform feels professional and fair. No fake brands.",
-            },
-          ].map((t, i) => (
-            <Box
-              key={i}
-              bg={cardBg}
-              p={6}
-              borderRadius="xl"
-              border="1px solid #eee"
-            >
-              <Icon as={MdVerified} color="green.400" mb={2} />
-              <Text mb={4}>"{t.text}"</Text>
-              <Text fontWeight="bold">{t.name}</Text>
-              <Text fontSize="sm" color="gray.500">
-                {t.role}
-              </Text>
-            </Box>
-          ))}
-        </SimpleGrid>
-      </Container>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
+            {[
+              ["Create Profile", "Set goals and create your campaign."],
+              ["Find Influencers", "Get matched with relevant creators."],
+              ["Track Performance", "Monitor results and optimize ROI."],
+            ].map(([title, desc], i) => (
+              <Box key={i} textAlign="center">
+                <Badge fontSize="lg" px={4} py={2} borderRadius="full" mb={4}>
+                  Step {i + 1}
+                </Badge>
+                <Heading size="md" mb={2}>
+                  {title}
+                </Heading>
+                <Text color="gray.600">{desc}</Text>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </Container>
+      </Box>
 
-      {/* CTA */}
-      <Container maxW="6xl" py={20} textAlign="center">
-        <Box
-          bg="orange.500"
-          color="white"
-          p={12}
-          borderRadius="2xl"
-        >
-          <Heading mb={4}>Ready to launch smarter campaigns?</Heading>
-          <Text mb={6}>Join Adchain and grow faster with data-driven marketing.</Text>
+      {/* ================= CTA ================= */}
+      <Box bgGradient={bgGradient} color="white">
+        <Container maxW="5xl" px={5} py={20} textAlign="center">
+          <Heading mb={6}>
+            Start scaling your brand with influencer marketing
+          </Heading>
+
+          <Text fontSize="lg" opacity={0.9} mb={8}>
+            Join growing startups and enterprises using Adchain to drive
+            measurable ROI.
+          </Text>
+
           <Button
             as={RouterLink}
             to="/signup"
             size="lg"
-            colorScheme="blackAlpha"
+            bg="white"
+            color="black"
+            _hover={{ bg: "gray.100" }}
           >
-            Get Started Free
+            Create Free Account
           </Button>
-        </Box>
-      </Container>
+        </Container>
+      </Box>
 
       <Footer />
     </Box>
   );
-}
+};
+
 export default Home;
+
+
 
