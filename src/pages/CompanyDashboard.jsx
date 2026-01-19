@@ -932,6 +932,201 @@
 
 // export default CompanyDashboard;
 
+// import React, { useState, useEffect } from "react";
+// import {
+//   Box,
+//   Heading,
+//   Text,
+//   HStack,
+//   IconButton,
+//   Badge,
+//   SimpleGrid,
+//   Divider,
+//   Input,
+//   Tabs,
+//   TabList,
+//   TabPanels,
+//   Tab,
+//   TabPanel,
+//   Menu,
+//   MenuButton,
+//   MenuList,
+//   MenuItem,
+// } from "@chakra-ui/react";
+// import { FaEllipsisV, FaChartBar } from "react-icons/fa";
+// import { useNavigate } from "react-router-dom";
+// import axios from "axios";
+// import CreateAd from "../components/CreateAd.jsx";
+// import { useAuth } from "../contexts/AuthContext.jsx";
+// import AppLayout from "../components/AppLayout";
+
+// function CompanyDashboard() {
+//   const { user } = useAuth();
+//   const navigate = useNavigate();
+//   const [ads, setAds] = useState([]);
+//   const [search, setSearch] = useState("");
+
+//   const fetchAds = async () => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       const res = await axios.get(
+//         "https://ad-chain-backend.vercel.app/api/ads/my-ads",
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       setAds(res.data || []);
+//     } catch (err) {
+//       console.error("Fetch failed:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchAds();
+//   }, []);
+
+//   const deleteAd = async (id) => {
+//     const token = localStorage.getItem("token");
+//     await axios.delete(
+//       `https://ad-chain-backend.vercel.app/api/ads/${id}`,
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+//     fetchAds();
+//   };
+
+//   const formatDate = (date) =>
+//     new Date(date).toLocaleString("en-IN", {
+//       day: "2-digit",
+//       month: "short",
+//       year: "numeric",
+//       hour: "2-digit",
+//       minute: "2-digit",
+//     });
+
+//   const filterAds = (status) =>
+//     ads
+//       .filter((ad) =>
+//         ad.title?.toLowerCase().includes(search.toLowerCase())
+//       )
+//       .filter((ad) => (status ? ad.status === status : true))
+//       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+//   const AdCard = ({ ad }) => (
+//     <Box bg="white" p={5} borderRadius="xl" boxShadow="sm" position="relative">
+//       {/* Menu */}
+//       <Box position="absolute" top="10px" right="10px">
+//         <Menu>
+//           <MenuButton as={IconButton} icon={<FaEllipsisV />} size="sm" />
+//           <MenuList>
+//             <MenuItem color="red.500" onClick={() => deleteAd(ad._id)}>
+//               Delete Campaign
+//             </MenuItem>
+//           </MenuList>
+//         </Menu>
+//       </Box>
+
+//       <Heading size="sm">{ad.title}</Heading>
+//       <Text fontSize="xs" color="gray.500">
+//         🕒 {formatDate(ad.createdAt)}
+//       </Text>
+
+//       <Text mt={2}>{ad.description}</Text>
+//       <Text fontSize="sm">💰 Budget: ${ad.budget}</Text>
+//       <Text fontSize="sm">📦 Category: {ad.category}</Text>
+
+//       <Badge
+//         mt={2}
+//         colorScheme={ad.status === "accepted" ? "green" : "yellow"}
+//       >
+//         {ad.status}
+//       </Badge>
+
+//       {/* Influencers */}
+//       {ad.influencers?.length > 0 && (
+//         <Box mt={4} bg="gray.50" p={3} borderRadius="lg">
+//           <Text fontWeight="bold" fontSize="sm">
+//             Accepted By:
+//           </Text>
+
+//           {ad.influencers.map((inf, i) => (
+//             <Box key={i} bg="white" p={3} mt={2} borderRadius="md">
+//               <Text fontSize="sm">👤 {inf.influencer?.name}</Text>
+//               <Text fontSize="sm">📧 {inf.influencer?.email}</Text>
+
+//               {inf.proof?.link ? (
+//                 <>
+//                   <a href={inf.proof.link} target="_blank" rel="noreferrer">
+//                     🔗 View Proof
+//                   </a>
+//                   <Text fontSize="sm">
+//                     👍 {inf.metrics?.likes || 0} | 💬 {inf.metrics?.comments || 0} | 👁 {inf.metrics?.views || 0}
+//                   </Text>
+//                   <Text fontSize="sm">🤖 AI Score: {inf.aiScore || 0}%</Text>
+//                 </>
+//               ) : (
+//                 <Text fontSize="sm" color="orange.500">
+//                   ⏳ Proof pending
+//                 </Text>
+//               )}
+//             </Box>
+//           ))}
+//         </Box>
+//       )}
+//     </Box>
+//   );
+
+//   return (
+//     <AppLayout>
+//       {/* Page Header */}
+//       <HStack justify="space-between" mb={6}>
+//         <Box>
+//           <Heading size="lg">Company Dashboard</Heading>
+//           <Text color="gray.500">Welcome, {user?.name}</Text>
+//         </Box>
+
+//         <IconButton
+//           icon={<FaChartBar />}
+//           colorScheme="orange"
+//           onClick={() => navigate("/company/analytics")}
+//         />
+//       </HStack>
+
+//       <CreateAd onAdCreated={fetchAds} />
+
+//       <Divider my={6} />
+
+//       <Input
+//         placeholder="Search campaigns..."
+//         mb={4}
+//         value={search}
+//         onChange={(e) => setSearch(e.target.value)}
+//       />
+
+//       <Tabs variant="soft-rounded" colorScheme="orange">
+//         <TabList mb={4}>
+//           <Tab>All</Tab>
+//           <Tab>Pending</Tab>
+//           <Tab>Accepted</Tab>
+//         </TabList>
+
+//         <TabPanels>
+//           {["", "pending", "accepted"].map((status, idx) => (
+//             <TabPanel key={idx}>
+//               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+//                 {filterAds(status).map((ad) => (
+//                   <AdCard key={ad._id} ad={ad} />
+//                 ))}
+//               </SimpleGrid>
+//             </TabPanel>
+//           ))}
+//         </TabPanels>
+//       </Tabs>
+//     </AppLayout>
+//   );
+// }
+
+// export default CompanyDashboard;
+
+
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -952,6 +1147,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Avatar,
 } from "@chakra-ui/react";
 import { FaEllipsisV, FaChartBar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -1010,8 +1206,7 @@ function CompanyDashboard() {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const AdCard = ({ ad }) => (
-    <Box bg="white" p={5} borderRadius="xl" boxShadow="sm" position="relative">
-      {/* Menu */}
+    <Box bg="white" p={5} borderRadius="2xl" boxShadow="sm" position="relative">
       <Box position="absolute" top="10px" right="10px">
         <Menu>
           <MenuButton as={IconButton} icon={<FaEllipsisV />} size="sm" />
@@ -1039,9 +1234,8 @@ function CompanyDashboard() {
         {ad.status}
       </Badge>
 
-      {/* Influencers */}
       {ad.influencers?.length > 0 && (
-        <Box mt={4} bg="gray.50" p={3} borderRadius="lg">
+        <Box mt={4} bg="gray.50" p={3} borderRadius="xl">
           <Text fontWeight="bold" fontSize="sm">
             Accepted By:
           </Text>
@@ -1075,17 +1269,31 @@ function CompanyDashboard() {
 
   return (
     <AppLayout>
-      {/* Page Header */}
+      {/* Header */}
       <HStack justify="space-between" mb={6}>
-        <Box>
-          <Heading size="lg">Company Dashboard</Heading>
-          <Text color="gray.500">Welcome, {user?.name}</Text>
-        </Box>
+        <HStack spacing={4}>
+          <Avatar
+            name={user?.name}
+            src={user?.avatar}
+            bg="orange.400"
+            color="white"
+          />
+          <Box>
+            <Heading size="md">Company Dashboard</Heading>
+            <HStack spacing={2}>
+              <Text fontSize="sm" color="gray.500">
+                {user?.name}
+              </Text>
+              <Badge colorScheme="orange">Company</Badge>
+            </HStack>
+          </Box>
+        </HStack>
 
         <IconButton
           icon={<FaChartBar />}
           colorScheme="orange"
           onClick={() => navigate("/company/analytics")}
+          aria-label="Analytics"
         />
       </HStack>
 
@@ -1110,7 +1318,7 @@ function CompanyDashboard() {
         <TabPanels>
           {["", "pending", "accepted"].map((status, idx) => (
             <TabPanel key={idx}>
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
                 {filterAds(status).map((ad) => (
                   <AdCard key={ad._id} ad={ad} />
                 ))}
@@ -1124,4 +1332,3 @@ function CompanyDashboard() {
 }
 
 export default CompanyDashboard;
-
