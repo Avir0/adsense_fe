@@ -170,7 +170,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import AppLayout from "../components/AppLayout";
+// import AppLayout from "../components/AppLayout";
 
 const COLORS = ["#38A169", "#ECC94B", "#E53E3E"];
 
