@@ -752,6 +752,7 @@ import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import CreateAd from "../components/CreateAd.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import AppLayout from "../components/AppLayout";
 
 function CompanyDashboard() {
   const { user } = useAuth();
