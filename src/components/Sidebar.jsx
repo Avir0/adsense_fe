@@ -50,129 +50,169 @@
 //         ))}
 
 
-import React from "react";
-import {
-  Box,
-  VStack,
-  Text,
-  HStack,
-  Icon,
-  Button,
-  Divider,
-} from "@chakra-ui/react";
-import {
-  FaHome,
-  FaChartBar,
-  FaBullhorn,
-  FaUser,
-  FaCog,
-  FaSignOutAlt,
-} from "react-icons/fa";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+// import React from "react";
+// import {
+//   Box,
+//   VStack,
+//   Text,
+//   HStack,
+//   Icon,
+//   Button,
+//   Divider,
+// } from "@chakra-ui/react";
+// import {
+//   FaHome,
+//   FaChartBar,
+//   FaBullhorn,
+//   FaUser,
+//   FaCog,
+//   FaSignOutAlt,
+// } from "react-icons/fa";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import { useAuth } from "../contexts/AuthContext";
 
-const Sidebar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, logout } = useAuth();
+// const Sidebar = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const { user, logout } = useAuth();
 
-  const isCompany = user?.role === "company";
-  const isInfluencer = user?.role === "influencer";
+//   const isCompany = user?.role === "company";
+//   const isInfluencer = user?.role === "influencer";
 
-  const menu = isCompany
-    ? [
-        { label: "Dashboard", icon: FaHome, path: "/company/dashboard" },
-        { label: "Analytics", icon: FaChartBar, path: "/company/analytics" },
-        { label: "Campaigns", icon: FaBullhorn, path: "/company/dashboard" },
-        { label: "Profile", icon: FaUser, path: "/company/profile" },
-        { label: "Settings", icon: FaCog, path: "#" },
-      ]
-    : [
-        { label: "Dashboard", icon: FaHome, path: "/influencer/dashboard" },
-        { label: "Profile", icon: FaUser, path: "/influencer/profile" },
-        { label: "Settings", icon: FaCog, path: "#" },
-      ];
+//   const menu = isCompany
+//     ? [
+//         { label: "Dashboard", icon: FaHome, path: "/company/dashboard" },
+//         { label: "Analytics", icon: FaChartBar, path: "/company/analytics" },
+//         { label: "Campaigns", icon: FaBullhorn, path: "/company/dashboard" },
+//         { label: "Profile", icon: FaUser, path: "/company/profile" },
+//         { label: "Settings", icon: FaCog, path: "#" },
+//       ]
+//     : [
+//         { label: "Dashboard", icon: FaHome, path: "/influencer/dashboard" },
+//         { label: "Profile", icon: FaUser, path: "/influencer/profile" },
+//         { label: "Settings", icon: FaCog, path: "#" },
+//       ];
 
-  return (
-    <Box
-      w={{ base: "70px", md: "240px" }}
-      bg="white"
-      borderRight="1px solid"
-      borderColor="gray.200"
-      minH="100vh"
-      px={3}
-      py={5}
-      position="sticky"
-      top="0"
-    >
-      {/* Logo */}
-      <HStack mb={8} justify={{ base: "center", md: "flex-start" }}>
-        <Box
-          bg="orange.400"
-          color="white"
-          fontWeight="bold"
-          px={3}
-          py={1}
-          borderRadius="md"
-        >
-          A
-        </Box>
-        <Text
-          fontWeight="bold"
-          display={{ base: "none", md: "block" }}
-        >
-          Adchain AI
-        </Text>
-      </HStack>
+//   return (
+//     <Box
+//       w={{ base: "70px", md: "240px" }}
+//       bg="white"
+//       borderRight="1px solid"
+//       borderColor="gray.200"
+//       minH="100vh"
+//       px={3}
+//       py={5}
+//       position="sticky"
+//       top="0"
+//     >
+//       {/* Logo */}
+//       <HStack mb={8} justify={{ base: "center", md: "flex-start" }}>
+//         <Box
+//           bg="orange.400"
+//           color="white"
+//           fontWeight="bold"
+//           px={3}
+//           py={1}
+//           borderRadius="md"
+//         >
+//           A
+//         </Box>
+//         <Text
+//           fontWeight="bold"
+//           display={{ base: "none", md: "block" }}
+//         >
+//           Adchain AI
+//         </Text>
+//       </HStack>
 
-      {/* Menu */}
-      <VStack align="stretch" spacing={1}>
-        {menu.map((item) => {
-          const active = location.pathname === item.path;
+//       {/* Menu */}
+//       <VStack align="stretch" spacing={1}>
+//         {menu.map((item) => {
+//           const active = location.pathname === item.path;
 
-          return (
-            <Button
-              key={item.label}
-              justifyContent={{ base: "center", md: "flex-start" }}
-              leftIcon={<Icon as={item.icon} />}
-              variant="ghost"
-              bg={active ? "orange.50" : "transparent"}
-              color={active ? "orange.500" : "gray.600"}
-              _hover={{ bg: "orange.50", color: "orange.500" }}
-              onClick={() => navigate(item.path)}
-              borderRadius="lg"
-            >
-              <Text display={{ base: "none", md: "block" }}>
-                {item.label}
-              </Text>
-            </Button>
-          );
-        })}
-      </VStack>
+//           return (
+//             <Button
+//               key={item.label}
+//               justifyContent={{ base: "center", md: "flex-start" }}
+//               leftIcon={<Icon as={item.icon} />}
+//               variant="ghost"
+//               bg={active ? "orange.50" : "transparent"}
+//               color={active ? "orange.500" : "gray.600"}
+//               _hover={{ bg: "orange.50", color: "orange.500" }}
+//               onClick={() => navigate(item.path)}
+//               borderRadius="lg"
+//             >
+//               <Text display={{ base: "none", md: "block" }}>
+//                 {item.label}
+//               </Text>
+//             </Button>
+//           );
+//         })}
+//       </VStack>
 
-      {/* Bottom logout */}
-      <Box position="absolute" bottom="20px" left="0" w="100%" px={3}>
-        <Divider mb={3} />
-        <Button
-          w="100%"
-          leftIcon={<FaSignOutAlt />}
-          variant="ghost"
-          color="red.500"
-          justifyContent={{ base: "center", md: "flex-start" }}
-          onClick={logout}
-        >
-          <Text display={{ base: "none", md: "block" }}>
-            Logout
-          </Text>
-        </Button>
-      </Box>
-    </Box>
-  );
-};
+//       {/* Bottom logout */}
+//       <Box position="absolute" bottom="20px" left="0" w="100%" px={3}>
+//         <Divider mb={3} />
+//         <Button
+//           w="100%"
+//           leftIcon={<FaSignOutAlt />}
+//           variant="ghost"
+//           color="red.500"
+//           justifyContent={{ base: "center", md: "flex-start" }}
+//           onClick={logout}
+//         >
+//           <Text display={{ base: "none", md: "block" }}>
+//             Logout
+//           </Text>
+//         </Button>
+//       </Box>
+//     </Box>
+//   );
+// };
 
-export default Sidebar;
+// export default Sidebar;
 
 //       </VStack>
 //     </Box>
 //   );
 // }
+
+
+import { Box, VStack, Button, Text } from "@chakra-ui/react";
+import { FaHome, FaChartBar, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+export default function Sidebar() {
+  const navigate = useNavigate();
+
+  return (
+    <Box
+      w={{ base: "100%", md: "240px" }}
+      bg="white"
+      borderRight="1px solid #eee"
+      p={4}
+      minH={{ base: "auto", md: "100vh" }}
+    >
+      <Text fontWeight="bold" fontSize="xl" mb={6}>
+        AdChain
+      </Text>
+
+      <VStack align="stretch" spacing={3}>
+        <Button leftIcon={<FaHome />} justifyContent="flex-start"
+          onClick={() => navigate("/company/dashboard")}>
+          Dashboard
+        </Button>
+
+        <Button leftIcon={<FaChartBar />} justifyContent="flex-start"
+          onClick={() => navigate("/company/analytics")}>
+          Analytics
+        </Button>
+
+        <Button leftIcon={<FaUser />} justifyContent="flex-start"
+          onClick={() => navigate("/company/profile")}>
+          Profile
+        </Button>
+      </VStack>
+    </Box>
+  );
+}
